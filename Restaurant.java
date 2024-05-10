@@ -2,7 +2,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Restaurant {
-    private String id;
     private String name;
     private String location;
     private Map<String, String[]> menu;
@@ -10,14 +9,12 @@ public class Restaurant {
 
     /**
      * Instantiate a restaurant object
-     * @param id Restaurant id
      * @param name Restaurant name
      * @param location Restaurant location
      * @param menu Restaurant menu
      * @param tags Restaurant tags
      */
-    public Restaurant(String id, String name, String location, Map<String, String[]> menu, Map<String, String> tags) {
-        setId(id);
+    public Restaurant(String name, String location, Map<String, String[]> menu, Map<String, String> tags) {
         setName(name);
         setLocation(location);
         setMenu(menu);
@@ -29,19 +26,10 @@ public class Restaurant {
      * @param restaurant The restaurant object to be copied
      */
     public Restaurant(Restaurant restaurant) {
-        setId(restaurant.getId());
         setName(restaurant.getName());
         setLocation(restaurant.getLocation());
         setMenu(restaurant.getMenu());
         setTags(restaurant.getTags());
-    }
-
-    /**
-     * Gets the id of the restaurant
-     * @return The id of the restaurant
-     */
-    public String getId() {
-        return id;
     }
 
     /**
@@ -74,14 +62,6 @@ public class Restaurant {
      */
     public Map<String, String> getTags() {
         return new HashMap<String, String>(tags);
-    }
-
-    /**
-     * Set the id of the restaurant
-     * @param id The id of the restaurant
-     */
-    public void setId(String id) {
-        this.id = id;
     }
 
     /**
