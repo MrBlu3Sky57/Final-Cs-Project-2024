@@ -111,9 +111,9 @@ public interface helpers {
             }
             
             netRatings.put(id, net);
-
-            // Sort, Search then return list....
         }
+        
+        // Sort, Search then return list....
 
         return null;
     }
