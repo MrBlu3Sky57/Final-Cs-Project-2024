@@ -93,6 +93,75 @@ public interface helpers {
         return average;
     }
 
+    /**
+     * Sort an array using the merge sort algorithm
+     * @param arr The array
+     * @param key The key by which to sort the array
+     */
+    public static void sort(String[] arr, Map<String, Double> key) {
+        int size, left;
+
+        for (size = 1; size <= arr.length; size = 2 * size) {
+            for (left = 0; left < arr.length - 1; left += 2*size) {
+                int mid = Math.min(left + size - 1, arr.length - 1);
+                int right = Math.min(left + 2*size - 1, arr.length-1);
+                merge(arr, left, mid, right, key);
+            }
+        }
+    }
+
+    /**
+     * Merge function for each step of the merge sort algorithm
+     * @param arr The array
+     * @param l The starting index
+     * @param m The middle index
+     * @param r The end index
+     * @param key The key by which to sort the array
+     */
+    public static void merge(String[] arr, int l, int m, int r, Map<String, Double> key) {
+        int i, j, k;
+        int n1 = m - l + 1;
+        int n2 = r - m;
+
+        String[] half1 = new String[n1];
+        String[] half2 = new String[n2];
+
+        for (i = 0; i < n1; i++) {
+            half1[i] = arr[l + i];
+        }
+
+        for (j = 0; j < n2; j++) {
+            half2[j] = arr[m + 1 + j];
+        }
+
+        i = 0;
+        j = 0;
+        k = l;
+        while (i < n1 && j < n2) {
+            if (key.get(half1[i]) >= key.get(half2[j])) {
+                arr[k] = half1[i];
+                i++;
+            } else {
+                arr[k] = half2[j];
+                j++;
+            }
+            k++;
+        }
+
+        while (i < n1) {
+            arr[k] = half1[i];
+            i++;
+            k++;
+        }
+
+        while (j < n2) {
+            arr[k] = half2[j];
+            j++;
+            k++;
+        }
+    }
+
+
     public static Map<String, Restaurant> recommend(Map<String, Restaurant> restaurants, String user_id) {
         Map<String, Double> userRatings = getUserRatings(user_id);
         Map<String, Double> netRatings = new HashMap<String, Double>();
