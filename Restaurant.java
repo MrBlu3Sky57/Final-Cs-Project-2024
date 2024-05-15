@@ -87,7 +87,7 @@ public class Restaurant {
      * @param menu The menu of the restaurant
      */
     public void setMenu(Map<String, String[]> menu) {
-        this.menu = menu;
+        this.menu = new HashMap<String, String[]>(menu);
     }
 
     /**
