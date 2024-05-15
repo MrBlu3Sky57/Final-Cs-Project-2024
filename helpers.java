@@ -161,7 +161,22 @@ public interface helpers {
         }
     }
 
+    /**
+     * To Do........
+     * @param user_id
+     * @param restaurant_id
+     * @return
+     */
+    public static boolean rated(String user_id, String restaurant_id) {
+        return true;
+    }
 
+    /**
+     * Get the recommendations for a user
+     * @param restaurants The restaurants map
+     * @param user_id The user id
+     * @return The top new restaurants for the user.
+     */
     public static Map<String, Restaurant> recommend(Map<String, Restaurant> restaurants, String user_id) {
         Map<String, Double> userRatings = getUserRatings(user_id);
         Map<String, Double> netRatings = new HashMap<String, Double>();
@@ -181,9 +196,23 @@ public interface helpers {
             netRatings.put(id, net);
         }
 
-        // Sort, Search then return list....
+        sort(ids, netRatings);
 
-        return null;
+        int numReturn = 0;
+        if (ids.length < 50) {
+            numReturn = ids.length;
+        } else {
+            numReturn = 50;
+        }
+
+        Map<String, Restaurant> recs = new HashMap<String, Restaurant>();
+        for (int i = 0; i < numReturn; i++) {
+            if (!rated(user_id, ids[1])) {
+                recs.put(ids[i], restaurants.get(ids[i]));
+            }
+        }
+
+        return recs;
     }
 
 }
