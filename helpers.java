@@ -1,6 +1,7 @@
 import java.util.Map;
 import java.util.Set;
 import java.util.HashMap;
+import java.util.ArrayList;
 import java.sql.*;
 
 public interface helpers {
@@ -9,14 +10,14 @@ public interface helpers {
     final static String db = "TBD";
 
     /**
-     * Gets the a user's ratings from the database
+     * Gets the user's ratings from the database
      * @param user_id The specific user's id
      * @return The user's ratings
      */
-    public static Map<String, Double> getUserRatings(String user_id) {
+    public static String[][] getUserRatings(String user_id) {
         Connection con;
         Statement stmt;
-        Map<String, Double> ratings = new HashMap<>();
+        String[][] ratings = null;
 
         try {
             con = DriverManager.getConnection(db);
@@ -24,9 +25,17 @@ public interface helpers {
 
             ResultSet rs = stmt.executeQuery("SELECT rating_type, rating FROM ratings WHERE user_id = " + user_id);
 
+            ArrayList<String> types = new ArrayList<>();
+            ArrayList<String> rates = new ArrayList<>();
             while(rs.next()) {
-                ratings.put(rs.getString(1),rs.getDouble(2));
+                types.add(rs.getString(1));
+                rates.add(rs.getString(2));
             }
+
+            ratings = new String[2][types.size()];
+            ratings[0] = types.toArray(ratings[0]);
+            ratings[1] = rates.toArray(ratings[1]);
+
         } catch(Exception e) {
             System.out.println(e);
         }
@@ -35,36 +44,59 @@ public interface helpers {
 
 
     /**
-     * TO DO........
-     * @param user_id
-     * @return
+     * Gets the restaurant's ratings from the database
+     * @param restaurant_id The specific restaurant's id
+     * @return The restaurant's ratings
      */
-    public static Map<String, Double> getRestrRatings(String restaurant_id) {
-        return null;
+    public static String[][] getRestrRatings(String restaurant_id) {
+        Connection con;
+        Statement stmt;
+        String[][] ratings = null;
+
+        try {
+            con = DriverManager.getConnection(db);
+            stmt = con.createStatement();
+
+            ResultSet rs = stmt.executeQuery("SELECT rating_type, rating FROM ratings WHERE restaurant_id = " + restaurant_id);
+
+            ArrayList<String> types = new ArrayList<>();
+            ArrayList<String> rates = new ArrayList<>();
+            while(rs.next()) {
+                types.add(rs.getString(1));
+                rates.add(rs.getString(2));
+            }
+
+            ratings = new String[2][types.size()];
+            ratings[0] = types.toArray(ratings[0]);
+            ratings[1] = rates.toArray(ratings[1]);
+        } catch(Exception e) {
+            System.out.println(e);
+        }
+        return ratings;
     }
 
     /**
      * Gets the weight of each tag for a user to determine their preferences
-     * @param userRatings All of the user's ratings, storing tag value : rating
+     * @param userRatings All of the user's ratings, storing tag value in parallel to rating
      * @return The tag weights for the user
      */
-    public static Map<String, Double> getWeights(Map<String, Double> userRatings) {
+    public static Map<String, Double> getWeights(String[][] userRatings) {
         Map<String, Double> weighted = new HashMap<String, Double>(); // Map to store tag weights
         Map<String, Integer> amounts = new HashMap<String, Integer>(); // Map to store tag frequencies
 
-        // Iterate over each entry in the user rating map
-        for (Map.Entry<String, Double> rating : userRatings.entrySet()) {
+        // Iterate over each entry in the user rating strings
+        for (int i = 0; i < userRatings[0].length; i++) {
 
             // If current tag is already present in weighted map
-            if (weighted.containsKey(rating.getKey())) {
-                weighted.replace(rating.getKey(), weighted.get(rating.getKey()) + rating.getValue()); // Add new value to current
-                amounts.replace(rating.getKey(), amounts.get(rating.getKey()) + 1); // Increment amount
+            if (weighted.containsKey(userRatings[0][i])) {
+                weighted.replace(userRatings[0][i], weighted.get(userRatings[0][i]) + Double.parseDouble(userRatings[1][i])); // Add new value to current
+                amounts.replace(userRatings[0][i], amounts.get(userRatings[0][i]) + 1); // Increment amount
             } 
             
             // If current tag is a new key in weighted map
             else {
-                weighted.put(rating.getKey(), rating.getValue()); // Set rating value as current
-                amounts.put(rating.getKey(), 1); // Set amount to 1
+                weighted.put(userRatings[0][i], Double.parseDouble(userRatings[1][i])); // Set rating value as current
+                amounts.put(userRatings[0][i], 1); // Set amount to 1
             }
         }
 
@@ -81,23 +113,23 @@ public interface helpers {
      * @param restrRatings Map of restaurant tag value and rating
      * @return The average rating for a restaurant for each of its tag values
      */
-    public static Map<String, Double> getAvgRatings(Map<String, Double> restrRatings) {
+    public static Map<String, Double> getAvgRatings(String[][] restrRatings) {
         Map<String, Double> average = new HashMap<String, Double>(); // Map to store average rating per tag
         Map<String, Integer> amounts = new HashMap<String, Integer>(); // Map to store rating frequencies
 
         // Iterate over each entry in the restr rating map
-        for (Map.Entry<String, Double> rating : restrRatings.entrySet()) {
+        for (int i = 0; i < restrRatings[0].length; i++) {
 
             // If current tag is already present in average map
-            if (average.containsKey(rating.getKey())) {
-                average.replace(rating.getKey(), average.get(rating.getKey()) + rating.getValue()); // Set rating value as current
-                amounts.replace(rating.getKey(), amounts.get(rating.getKey()) + 1); // Set amount to 1
+            if (average.containsKey(restrRatings[0][i])) {
+                average.replace(restrRatings[0][i], average.get(restrRatings[0][i]) + Double.parseDouble(restrRatings[1][i])); // Set rating value as current
+                amounts.replace(restrRatings[0][i], amounts.get(restrRatings[0][i]) + 1); // Set amount to 1
             }
 
             // If current tag is a new key in average map
             else {
-                average.put(rating.getKey(), rating.getValue()); // Set rating value as current
-                amounts.put(rating.getKey(), 1); // Set amount to 1
+                average.put(restrRatings[0][i], Double.parseDouble(restrRatings[1][i])); // Set rating value as current
+                amounts.put(restrRatings[0][i], 1); // Set amount to 1
             }
         }
 
@@ -194,7 +226,8 @@ public interface helpers {
      * @return The top new restaurants for the user.
      */
     public static Map<String, Restaurant> recommend(Map<String, Restaurant> restaurants, String user_id) {
-        Map<String, Double> userRatings = getUserRatings(user_id);
+        String[][] userRatings = getUserRatings(user_id);
+        Map<String, Double> weights = getWeights(userRatings);
         Map<String, Double> netRatings = new HashMap<String, Double>();
 
         Set<String> keySet = restaurants.keySet();
@@ -202,11 +235,12 @@ public interface helpers {
         ids = keySet.toArray(ids);
 
         for (String id : ids) {
-            Map<String, Double> restrRatings = getRestrRatings(id);
+            String[][] restrRatings = getRestrRatings(id);
+            Map<String, Double> avgRating = getAvgRatings(restrRatings);
 
             Double net = 0.0;
-            for (String key : restrRatings.keySet()) {
-                net += restrRatings.get(key) * userRatings.get(key);
+            for (String key : avgRating.keySet()) {
+                net += avgRating.get(key) * weights.get(key);
             }
             
             netRatings.put(id, net);
