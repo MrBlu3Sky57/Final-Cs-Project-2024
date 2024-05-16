@@ -1,25 +1,41 @@
 import java.util.Map;
 import java.util.Set;
 import java.util.HashMap;
+import java.sql.*;
 
 public interface helpers {
     final static String[] tagTypes = {"Cuisine", "Ambiance", "Price", "Style"};
     final static String[] ratingTypes = {"Taste", "Ambiance", "WorthIt", "Enjoy", "Hygiene", "Service"};
+    final static String db = "TBD";
 
     /**
-     * TO DO........
-     * @param db
-     * @param user_id
-     * @return
+     * Gets the a user's ratings from the database
+     * @param user_id The specific user's id
+     * @return The user's ratings
      */
     public static Map<String, Double> getUserRatings(String user_id) {
-        return null;
+        Connection con;
+        Statement stmt;
+        Map<String, Double> ratings = new HashMap<>();
+
+        try {
+            con = DriverManager.getConnection(db);
+            stmt = con.createStatement();
+
+            ResultSet rs = stmt.executeQuery("SELECT rating_type, rating FROM ratings WHERE user_id = " + user_id);
+
+            while(rs.next()) {
+                ratings.put(rs.getString(1),rs.getDouble(2));
+            }
+        } catch(Exception e) {
+            System.out.println(e);
+        }
+        return ratings;
     }
 
 
     /**
      * TO DO........
-     * @param db
      * @param user_id
      * @return
      */
