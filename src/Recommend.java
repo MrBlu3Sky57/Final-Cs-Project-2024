@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.sql.*;
 
-public interface Helpers {
+public interface Recommend {
     final static String[] TAG_TYPES = {"Cuisine", "Ambiance", "Price", "Style"};
     final static String[] RATING_TYPES = {"Taste", "Ambiance", "WorthIt", "Enjoy", "Hygiene", "Service"};
     final static String DB = "jdbc:sqlite:data/taftr.db";
