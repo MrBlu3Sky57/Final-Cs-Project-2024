@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.sql.*;
 
 public interface Helpers {
-    final static String[] tagTypes = {"Cuisine", "Ambiance", "Price", "Style"}; // Make consts format
-    final static String[] ratingTypes = {"Taste", "Ambiance", "WorthIt", "Enjoy", "Hygiene", "Service"};
-    final static String db = "TBD";
+    final static String[] TAG_TYPES = {"Cuisine", "Ambiance", "Price", "Style"}; // Make consts format
+    final static String[] RATING_TYPES = {"Taste", "Ambiance", "WorthIt", "Enjoy", "Hygiene", "Service"};
+    final static String DB = "TBD";
 
     /**
      * Gets the user's ratings from the database
@@ -20,7 +20,7 @@ public interface Helpers {
         String[][] ratings = null;
 
         try {
-            con = DriverManager.getConnection(db);
+            con = DriverManager.getConnection(DB);
             stmt = con.createStatement();
 
             ResultSet rs = stmt.executeQuery("SELECT rating_type, rating FROM ratings WHERE user_id = " + user_id);
@@ -54,7 +54,7 @@ public interface Helpers {
         String[][] ratings = null;
 
         try {
-            con = DriverManager.getConnection(db);
+            con = DriverManager.getConnection(DB);
             stmt = con.createStatement();
 
             ResultSet rs = stmt.executeQuery("SELECT rating_type, rating FROM ratings WHERE restaurant_id = " + restaurant_id);
