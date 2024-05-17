@@ -84,7 +84,7 @@ public interface helpers {
         Map<String, Double> weighted = new HashMap<String, Double>(); // Map to store tag weights
         Map<String, Integer> amounts = new HashMap<String, Integer>(); // Map to store tag frequencies
 
-        // Iterate over each entry in the user rating strings
+        // Iterate over each entry in the user rating array
         for (int i = 0; i < userRatings[0].length; i++) {
 
             // If current tag is already present in weighted map
@@ -117,7 +117,7 @@ public interface helpers {
         Map<String, Double> average = new HashMap<String, Double>(); // Map to store average rating per tag
         Map<String, Integer> amounts = new HashMap<String, Integer>(); // Map to store rating frequencies
 
-        // Iterate over each entry in the restr rating map
+        // Iterate over each entry in the restr rating array
         for (int i = 0; i < restrRatings[0].length; i++) {
 
             // If current tag is already present in average map
