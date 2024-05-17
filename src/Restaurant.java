@@ -6,7 +6,7 @@ import java.util.Map;
 public class Restaurant {
     private String name;
     private String location;
-    private Map<String, String[]> menu; // change
+    private Map<String, Double> menu; // change
     private Map<String, String> tags;
 
     /**
@@ -16,7 +16,7 @@ public class Restaurant {
      * @param menu Restaurant menu
      * @param tags Restaurant tags
      */
-    public Restaurant(String name, String location, Map<String, String[]> menu, Map<String, String> tags) {
+    public Restaurant(String name, String location, Map<String, Double> menu, Map<String, String> tags) {
         setName(name);
         setLocation(location);
         setMenu(menu);
@@ -54,8 +54,8 @@ public class Restaurant {
      * Gets the menu of the restaurant
      * @return A copy of the restaurant map
      */
-    public Map<String, String[]> getMenu() {
-        return new HashMap<String, String[]>(menu);
+    public Map<String, Double> getMenu() {
+        return new HashMap<String, Double>(menu);
     }
 
     /**
@@ -86,8 +86,8 @@ public class Restaurant {
      * Set the menu of the restaurant
      * @param menu The menu of the restaurant
      */
-    public void setMenu(Map<String, String[]> menu) {
-        this.menu = new HashMap<String, String[]>(menu);
+    public void setMenu(Map<String, Double> menu) {
+        this.menu = new HashMap<String, Double>(menu);
     }
 
     /**
