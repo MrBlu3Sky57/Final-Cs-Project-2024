@@ -1,0 +1,32 @@
+CREATE TABLE restaurants (
+ id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+ name TEXT NOT NULL,
+ location TEXT NOT NULL);
+
+CREATE TABLE tags (
+ id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+ restaurant_id INTEGER NOT NULL,
+ tag_type TEXT NOT NULL,
+ tag_value TEXT NOT NULL,
+ FOREIGN KEY(restaurant_id) REFERENCES restaurants(id));
+
+CREATE TABLE menus (
+ id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+ restaurant_id INTEGER NOT NULL,
+ item_name TEXT NOT NULL,
+ price REAL NOT NULL,
+ FOREIGN KEY(restaurant_id) REFERENCES restaurants(id));
+
+CREATE TABLE users (
+ id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+ username TEXT NOT NULL,
+ password TEXT NOT NULL);
+
+CREATE TABLE ratings(
+ id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+ user_id INTEGER NOT NULL,
+ restaurant_id INTEGER NOT NULL,
+ rating_type TEXT NOT NULL,
+ rating INTEGER NOT NULL,
+ FOREIGN KEY(user_id) REFERENCES users(id),
+ FOREIGN KEY(restaurant_id) REFERENCES restaurants(id));
