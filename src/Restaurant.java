@@ -6,7 +6,7 @@ import java.util.Map;
 public class Restaurant {
     private String name;
     private String location;
-    private Map<String, Double> menu; // change
+    private Map<String, Double> menu;
     private Map<String, String> tags;
 
     /**
