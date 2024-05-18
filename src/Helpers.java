@@ -105,6 +105,103 @@ public interface Helpers {
     }
 
     /**
+     * Add a restaurant's data to the database
+     * @param name The restaurant's name
+     * @param location The location of the restaurant
+     * @param menu The restaurant's menu
+     * @param tags The restaurant's tags
+     * @param restaurants The restaurants map
+     * @return True or false, if restaurant is not already in database
+     */
+    public static boolean addRestaurant(String name, String location, Map<String, Double> menu, Map<String, String> tags, Map<String, Restaurant> restaurants) {
+        if (!checkRestaurant(name)) {
+            return false;
+        }
+        Connection con;
+        String id = null;
+
+        try {
+            con = DriverManager.getConnection(DB);
+            String input = "INSERT INTO restaurants (name, location) VALUES (?, ?)";
+            
+            try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                pstmt.setString(1, name);
+                pstmt.setString(2, location);
+
+                pstmt.executeUpdate();
+            }
+
+            input = "SELECT id FROM restaurants WHERE name = ?";
+
+            try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                pstmt.setString(1, name);
+
+                id = pstmt.executeQuery().getString(1);
+            }
+
+            input = "INSERT INTO menus (restaurant_id, item_name, price) VALUES (?, ?, ?)";
+
+            try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                for (Map.Entry<String, Double> pair : menu.entrySet()) {
+                    pstmt.setString(1, id);
+                    pstmt.setString(2, pair.getKey());
+                    pstmt.setDouble(3, pair.getValue());
+
+                    pstmt.executeUpdate();
+                }
+
+            }
+
+            input = "INSERT INTO tags (restaurant_id, tag_name, tag_value) VALUES (?, ?, ?)";
+
+            try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                for (Map.Entry<String, String> pair : tags.entrySet()) {
+                    pstmt.setString(1, id);
+                    pstmt.setString(2, pair.getKey());
+                    pstmt.setString(3, pair.getValue());
+
+                    pstmt.executeUpdate();
+                }
+
+            }
+        } catch(Exception e) {
+            System.out.println(e);
+        }
+        
+        restaurants.put(id, new Restaurant(name, location, menu, tags));
+        return true;
+
+    }
+
+    /**
+     * Check if a restaurant is already in the database
+     * @param restrName The name of the restaurant
+     * @return True or False based on whether the restaurant is in the database
+     */
+    public static boolean checkRestaurant(String restrName) {
+        Connection con;
+        ResultSet rs;
+        
+        try {
+            con = DriverManager.getConnection(DB);
+
+            String input = "SELECT * FROM restaurants WHERE name = ?";
+            try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                pstmt.setString(1, restrName);
+                rs = pstmt.executeQuery();
+            }
+
+            if (rs.getFetchSize() == 0) {
+                return false;
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return true;
+
+    }
+
+    /**
      * Gets the user's ratings from the database
      * @param user_id The specific user's id
      * @return The user's ratings
