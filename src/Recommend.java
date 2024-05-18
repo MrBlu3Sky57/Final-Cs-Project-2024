@@ -1,79 +1,9 @@
 import java.util.Map;
 import java.util.Set;
 import java.util.HashMap;
-import java.util.ArrayList;
-import java.sql.*;
 
 public interface Recommend {
-    final static String[] TAG_TYPES = {"Cuisine", "Ambiance", "Price", "Style"};
-    final static String[] RATING_TYPES = {"Taste", "Ambiance", "WorthIt", "Enjoy", "Hygiene", "Service"};
-    final static String DB = "jdbc:sqlite:data/taftr.db";
 
-    /**
-     * Gets the user's ratings from the database
-     * @param user_id The specific user's id
-     * @return The user's ratings
-     */
-    public static String[][] getUserRatings(String user_id) {
-        Connection con;
-        Statement stmt;
-        String[][] ratings = null;
-
-        try {
-            con = DriverManager.getConnection(DB);
-            stmt = con.createStatement();
-
-            ResultSet rs = stmt.executeQuery("SELECT rating_type, rating FROM ratings WHERE user_id = " + user_id);
-
-            ArrayList<String> types = new ArrayList<>();
-            ArrayList<String> rates = new ArrayList<>();
-            while(rs.next()) {
-                types.add(rs.getString(1));
-                rates.add(rs.getString(2));
-            }
-
-            ratings = new String[2][types.size()];
-            ratings[0] = types.toArray(ratings[0]);
-            ratings[1] = rates.toArray(ratings[1]);
-
-        } catch(Exception e) {
-            System.out.println(e);
-        }
-        return ratings;
-    }
-
-
-    /**
-     * Gets the restaurant's ratings from the database
-     * @param restaurant_id The specific restaurant's id
-     * @return The restaurant's ratings
-     */
-    public static String[][] getRestrRatings(String restaurant_id) {
-        Connection con;
-        Statement stmt;
-        String[][] ratings = null;
-
-        try {
-            con = DriverManager.getConnection(DB);
-            stmt = con.createStatement();
-
-            ResultSet rs = stmt.executeQuery("SELECT rating_type, rating FROM ratings WHERE restaurant_id = " + restaurant_id);
-
-            ArrayList<String> types = new ArrayList<>();
-            ArrayList<String> rates = new ArrayList<>();
-            while(rs.next()) {
-                types.add(rs.getString(1));
-                rates.add(rs.getString(2));
-            }
-
-            ratings = new String[2][types.size()];
-            ratings[0] = types.toArray(ratings[0]);
-            ratings[1] = rates.toArray(ratings[1]);
-        } catch(Exception e) {
-            System.out.println(e);
-        }
-        return ratings;
-    }
 
     /**
      * Gets the weight of each tag for a user to determine their preferences
@@ -226,7 +156,7 @@ public interface Recommend {
      * @return The top new restaurants for the user.
      */
     public static Map<String, Restaurant> recommend(Map<String, Restaurant> restaurants, String user_id) {
-        String[][] userRatings = getUserRatings(user_id);
+        String[][] userRatings = Helpers.getUserRatings(user_id);
         Map<String, Double> weights = getWeights(userRatings);
         Map<String, Double> netRatings = new HashMap<String, Double>();
 
@@ -235,7 +165,7 @@ public interface Recommend {
         ids = keySet.toArray(ids);
 
         for (String id : ids) {
-            String[][] restrRatings = getRestrRatings(id);
+            String[][] restrRatings = Helpers.getRestrRatings(id);
             Map<String, Double> avgRating = getAvgRatings(restrRatings);
 
             Double net = 0.0;

@@ -3,7 +3,26 @@
 public class User {
     private String username;
     private String password;
-    private Restaurant[] favourites;
+
+
+    /**
+     * Instantiate a user object
+     * @param username Username
+     * @param password Password
+     */
+    public User(String username, String password) {
+        setUsername(username);
+        setPassword(password);
+    }
+
+    /**
+     * Copy constructor for the user class
+     * @param user The user object to be copied
+     */
+    public User(User user) {
+        setUsername(user.getUsername());
+        setPassword(user.getPassword());
+    }
 
     /**
      * Get the username of the user
@@ -22,21 +41,6 @@ public class User {
     }
 
     /**
-     * Get the user's favourite restaurants
-     * @return The user's favourite restaurants
-     */
-    public Restaurant[] getFavourites() {
-        Restaurant[] favourites = new Restaurant[this.favourites.length];
-
-        int i = 0;
-        for (Restaurant restaurant : this.favourites) {
-            favourites[i] = new Restaurant(restaurant);
-            i++;
-        }
-        return favourites;
-    }
-
-    /**
      * Set the username of the user
      * @param username The user's username
      */
@@ -50,19 +54,5 @@ public class User {
      */
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    /**
-     * Set the user's favourites
-     * @param favourites The user's favourites
-     */
-    public void setFavourites(Restaurant[] favourites) {
-        this.favourites = new Restaurant[favourites.length];
-
-        int i = 0;
-        for (Restaurant restaurant : favourites) {
-            this.favourites[i] = new Restaurant(restaurant);
-            i++;
-        }
     }
 }
