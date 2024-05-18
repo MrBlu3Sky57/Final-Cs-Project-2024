@@ -16,7 +16,7 @@ public interface Helpers {
      * @return Returns true if the user can be added and false if the username already exists
      */
     public static boolean addUser(String username, String password, Map<String, User> users) {
-        if (!checkUser(username)) {
+        if (checkUser(username)) {
             return false;
         }
 
@@ -114,7 +114,7 @@ public interface Helpers {
      * @return True or false, if restaurant is not already in database
      */
     public static boolean addRestaurant(String name, String location, Map<String, Double> menu, Map<String, String> tags, Map<String, Restaurant> restaurants) {
-        if (!checkRestaurant(name)) {
+        if (checkRestaurant(name)) {
             return false;
         }
         Connection con;
@@ -152,7 +152,7 @@ public interface Helpers {
 
             }
 
-            input = "INSERT INTO tags (restaurant_id, tag_name, tag_value) VALUES (?, ?, ?)";
+            input = "INSERT INTO tags (restaurant_id, tag_type, tag_value) VALUES (?, ?, ?)";
 
             try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 for (Map.Entry<String, String> pair : tags.entrySet()) {
