@@ -6,6 +6,13 @@ import java.sql.*;
 public interface Helpers {
     final static String[] TAG_TYPES = {"Cuisine", "Ambiance", "Price", "Style"};
     final static String[] RATING_TYPES = {"Taste", "Ambiance", "WorthIt", "Enjoy", "Hygiene", "Service"};
+    final static Map<String, String> CONVERT = Map.of(
+            TAG_TYPES[0], RATING_TYPES[0],
+            TAG_TYPES[1], RATING_TYPES[1],
+            TAG_TYPES[2], RATING_TYPES[2],
+            TAG_TYPES[3], RATING_TYPES[3]
+
+    );
     final static String DB = "jdbc:sqlite:data/taftr.db";
 
     /**
@@ -366,7 +373,7 @@ public interface Helpers {
             con = DriverManager.getConnection(DB);
 
             ResultSet rs = null;
-            String input = "SELECT rating_type, rating FROM ratings WHERE user_id = ?";
+            String input = "SELECT restaurant_id, rating_type, rating FROM ratings WHERE user_id = ?";
             try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 pstmt.setString(1, userId);
                 rs = pstmt.executeQuery();
@@ -375,8 +382,19 @@ public interface Helpers {
             ArrayList<String> types = new ArrayList<>();
             ArrayList<String> rates = new ArrayList<>();
             while(rs.next()) {
-                types.add(rs.getString(1));
-                rates.add(rs.getString(2));
+                String restrId = rs.getString(1);
+                String tag = CONVERT.get(rs.getString(2));
+                String tag_value = null;
+
+                input = "SELECT tag_value FROM tags WHERE restaurant_id = ? and tag_type = ?";
+                try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                    pstmt.setString(1, restrId);
+                    pstmt.setString(2, tag);
+                    tag_value = pstmt.executeQuery().getString(1);
+                }
+
+                types.add(tag_value);
+                rates.add(rs.getString(3));
             }
 
             ratings = new String[2][types.size()];
@@ -412,7 +430,17 @@ public interface Helpers {
             ArrayList<String> types = new ArrayList<>();
             ArrayList<String> rates = new ArrayList<>();
             while(rs.next()) {
-                types.add(rs.getString(1));
+                String tag = CONVERT.get(rs.getString(1));
+                String tag_value = null;
+
+                input = "SELECT tag_value FROM tags WHERE restaurant_id = ? and tag_type = ?";
+                try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                    pstmt.setString(1, restrId);
+                    pstmt.setString(2, tag);
+                    tag_value = pstmt.executeQuery().getString(1);
+                }
+
+                types.add(tag_value);
                 rates.add(rs.getString(2));
             }
 
