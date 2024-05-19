@@ -7,7 +7,7 @@ public interface Helpers {
     final static String[] TAG_TYPES = {"Cuisine", "Ambiance", "Price", "Style"};
     final static String[] RATING_TYPES = {"Taste", "Ambiance", "WorthIt", "Enjoy", "Hygiene", "Service"};
     final static String DB = "jdbc:sqlite:data/taftr.db";
-    
+
     /**
      * Add a user to the database and user map
      * @param username The user's name
@@ -55,18 +55,18 @@ public interface Helpers {
      */
     public static boolean checkUser(String username) {
         Connection con;
-        ResultSet rs;
+        int numUsers;
         
         try {
             con = DriverManager.getConnection(DB);
 
-            String input = "SELECT * FROM users WHERE username = ?";
+            String input = "SELECT COUNT(*) FROM users WHERE username = ?";
             try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 pstmt.setString(1, username);
-                rs = pstmt.executeQuery();
+                numUsers = pstmt.executeQuery().getInt(1);
             }
 
-            if (rs.getFetchSize() == 0) {
+            if (numUsers == 0) {
                 return false;
             }
         } catch (Exception e) {
@@ -180,18 +180,18 @@ public interface Helpers {
      */
     public static boolean checkRestaurant(String restrName) {
         Connection con;
-        ResultSet rs;
+        int numRestr;
         
         try {
             con = DriverManager.getConnection(DB);
 
-            String input = "SELECT * FROM restaurants WHERE name = ?";
+            String input = "SELECT COUNT(*) FROM restaurants WHERE name = ?";
             try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 pstmt.setString(1, restrName);
-                rs = pstmt.executeQuery();
+                numRestr = pstmt.executeQuery().getInt(1);
             }
 
-            if (rs.getFetchSize() == 0) {
+            if (numRestr == 0) {
                 return false;
             }
         } catch (Exception e) {
@@ -202,11 +202,163 @@ public interface Helpers {
     }
 
     /**
+     * Add a rating to the database
+     * @param userId The user's id
+     * @param restrId The restaurant's id
+     * @param ratingType The rating type
+     * @param rating The rating value
+     */
+    public static void addRating(String userId, String restrId, String ratingType, double rating) {
+        Connection con;
+
+        try {
+            con = DriverManager.getConnection(DB);
+
+            String input = "";
+            if (rated(userId, restrId, ratingType)) {
+                input = "UPDATE ratings SET rating = ? WHERE user_id = ? and restaurant_id = ? and rating_type = ?";
+
+                try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                    pstmt.setDouble(1, rating);
+                    pstmt.setString(2, userId);
+                    pstmt.setString(3, restrId);
+                    pstmt.setString(4, ratingType);
+
+                    pstmt.executeUpdate();
+                }
+            } else {
+                input = "INSERT INTO ratings (user_id, restaurant_id, rating_type, rating) VALUES (?, ?, ?, ?)";
+
+                try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                    pstmt.setString(1, userId);
+                    pstmt.setString(2, restrId);
+                    pstmt.setString(3, ratingType);
+                    pstmt.setDouble(4, rating);
+
+                    pstmt.executeUpdate();
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    /**
+     * Check if a user has already rated a restaurant
+     * @param userId The user's id
+     * @param restrId The restaurant's id
+     * @return True or false based on whether the user has rated the restaurant
+     */
+    public static boolean rated(String userId, String restrId) {
+        Connection con;
+        int numRates;
+
+        try {
+            con = DriverManager.getConnection(DB);
+            String input = "SELECT COUNT(*) FROM ratings WHERE user_id = ? and restaurant_id = ?";
+
+            try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                pstmt.setString(1, userId);
+                pstmt.setString(2, restrId);
+
+                numRates = pstmt.executeQuery().getInt(1);
+
+                if (numRates == 0) {
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return true;
+    }
+
+        /**
+     * Check if a user has already rated a restaurant for a specific rating type
+     * @param userId User id
+     * @param restrId Restaurant id
+     * @param ratingType The rating type
+     * @return True or False based on whether or not user has rated the restaurant
+     */
+    public static boolean rated(String userId, String restrId, String ratingType) {
+        Connection con;
+        int numRates;
+
+        try {
+            con = DriverManager.getConnection(DB);
+            String input = "SELECT COUNT(*) FROM ratings WHERE user_id = ? and restaurant_id = ? and rating_type = ?";
+
+            try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                pstmt.setString(1, userId);
+                pstmt.setString(2, restrId);
+                pstmt.setString(3, ratingType);
+
+                numRates = pstmt.executeQuery().getInt(1);
+
+                if (numRates == 0) {
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return true;
+    }
+
+    /**
+     * Gets the id of a user
+     * @param username The username
+     * @return The id for the username
+     */
+    public static String getUserId(String username) {
+        Connection con;
+        String id = null;
+        
+        try {
+            con = DriverManager.getConnection(DB);
+
+            String input = "SELECT id FROM users WHERE username = ?";
+            try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                pstmt.setString(1, username);
+                id = pstmt.executeQuery().getString(1);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return id;
+    }
+
+    /**
+     * Gets the id of a user
+     * @param username The username
+     * @return The id for the username
+     */
+    public static String getRestrId(String restrName) {
+        Connection con;
+        String id = null;
+        
+        try {
+            con = DriverManager.getConnection(DB);
+
+            String input = "SELECT id FROM restaurants WHERE name = ?";
+            try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                pstmt.setString(1, restrName);
+                id = pstmt.executeQuery().getString(1);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return id;
+    }
+
+    /**
      * Gets the user's ratings from the database
-     * @param user_id The specific user's id
+     * @param userId The specific user's id
      * @return The user's ratings
      */
-    public static String[][] getUserRatings(String user_id) {
+    public static String[][] getUserRatings(String userId) {
         Connection con;
         String[][] ratings = null;
 
@@ -216,7 +368,7 @@ public interface Helpers {
             ResultSet rs = null;
             String input = "SELECT rating_type, rating FROM ratings WHERE user_id = ?";
             try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                pstmt.setString(1, user_id);
+                pstmt.setString(1, userId);
                 rs = pstmt.executeQuery();
             }
 
@@ -240,10 +392,10 @@ public interface Helpers {
 
     /**
      * Gets the restaurant's ratings from the database
-     * @param restaurant_id The specific restaurant's id
+     * @param restrId The specific restaurant's id
      * @return The restaurant's ratings
      */
-    public static String[][] getRestrRatings(String restaurant_id) {
+    public static String[][] getRestrRatings(String restrId) {
         Connection con;
         String[][] ratings = null;
 
@@ -253,7 +405,7 @@ public interface Helpers {
             ResultSet rs = null;
             String input = "SELECT rating_type, rating FROM ratings WHERE restaurant_id = ?";
             try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                pstmt.setString(1, restaurant_id);
+                pstmt.setString(1, restrId);
                 rs = pstmt.executeQuery();
             }
 

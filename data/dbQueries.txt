@@ -27,6 +27,6 @@ CREATE TABLE ratings(
  user_id INTEGER NOT NULL,
  restaurant_id INTEGER NOT NULL,
  rating_type TEXT NOT NULL,
- rating INTEGER NOT NULL,
+ rating REAL NOT NULL,
  FOREIGN KEY(user_id) REFERENCES users(id),
  FOREIGN KEY(restaurant_id) REFERENCES restaurants(id));
