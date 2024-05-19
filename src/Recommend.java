@@ -140,22 +140,53 @@ public interface Recommend {
     }
 
     /**
-     * To Do........
-     * @param user_id
-     * @param restaurant_id
-     * @return
+     * Gets the top 50 highest rated restaurants on average
+     * @param restaurants The restaurants map
+     * @return The map of the top 50 restaurants
      */
-    public static boolean rated(String user_id, String restaurant_id) {
-        return true;
+    public static Map<String, Restaurant> avgRecommend(Map<String, Restaurant> restaurants) {
+        Map<String, Double> netAvgRatings = new HashMap<String, Double>();
+
+        Set<String> keySet = restaurants.keySet();
+        String[] ids = new String[keySet.size()];
+        ids = keySet.toArray(ids);
+        for (String id : ids) {
+            String[][] restrRatings = Helpers.getRestrRatings(id);
+            Map<String, Double> avgRatings = getAvgRatings(restrRatings);
+
+            Double avg = 0.0;
+            for (Double rating : avgRatings.values()) {
+                avg += rating;
+            }
+            avg = avg / (double) avgRatings.size();
+
+            netAvgRatings.put(id, avg);
+        }
+
+        sort(ids, netAvgRatings);
+
+        int numReturn = 0;
+        if (ids.length < 50) {
+            numReturn = ids.length;
+        } else {
+            numReturn = 50;
+        }
+
+        Map<String, Restaurant> recs = new HashMap<String, Restaurant>();
+        for (int i = 0; i < numReturn; i++) {
+            recs.put(ids[i], restaurants.get(ids[i]));
+        }
+
+        return recs;
     }
 
     /**
-     * Get the recommendations for a user
+     * Get the recommendations for a user based on their preferences
      * @param restaurants The restaurants map
      * @param user_id The user id
      * @return The top new restaurants for the user.
      */
-    public static Map<String, Restaurant> recommend(Map<String, Restaurant> restaurants, String user_id) {
+    public static Map<String, Restaurant> smartRecommend(Map<String, Restaurant> restaurants, String user_id) {
         String[][] userRatings = Helpers.getUserRatings(user_id);
         Map<String, Double> weights = getWeights(userRatings);
         Map<String, Double> netRatings = new HashMap<String, Double>();
@@ -187,7 +218,7 @@ public interface Recommend {
 
         Map<String, Restaurant> recs = new HashMap<String, Restaurant>();
         for (int i = 0; i < numReturn; i++) {
-            if (!rated(user_id, ids[1])) {
+            if (!Helpers.rated(user_id, ids[1])) {
                 recs.put(ids[i], restaurants.get(ids[i]));
             }
         }
