@@ -7,10 +7,10 @@ public interface Helpers {
     final static String[] TAG_TYPES = {"Cuisine", "Ambiance", "Price", "Style"};
     final static String[] RATING_TYPES = {"Taste", "Ambiance", "WorthIt", "Enjoy", "Hygiene", "Service"};
     final static Map<String, String> CONVERT = Map.of(
-            TAG_TYPES[0], RATING_TYPES[0],
-            TAG_TYPES[1], RATING_TYPES[1],
-            TAG_TYPES[2], RATING_TYPES[2],
-            TAG_TYPES[3], RATING_TYPES[3]
+            RATING_TYPES[0], TAG_TYPES[0],
+            RATING_TYPES[1], TAG_TYPES[1],
+            RATING_TYPES[2], TAG_TYPES[2],
+            RATING_TYPES[3], TAG_TYPES[3]
 
     );
     final static String DB = "jdbc:sqlite:data/taftr.db";
@@ -209,6 +209,57 @@ public interface Helpers {
     }
 
     /**
+     * Get all of the restaurants in the database
+     * @return A map of id to restaurant object
+     */
+    public static Map<String, Restaurant> getRestr() {
+        Connection con;
+        Statement stmt;
+        Map<String, Restaurant> restr = new HashMap<String, Restaurant>();
+
+        try {
+            con = DriverManager.getConnection(DB);
+            stmt = con.createStatement();
+
+            ResultSet rs = stmt.executeQuery("SELECT * FROM restaurants");
+
+            Map<String, Double> menu = new HashMap<>();
+            Map<String, String> tags = new HashMap<>();
+            while (rs.next()) {
+                String id = rs.getString(1);
+
+                String input = "SELECT item_name, price FROM menus WHERE restaurant_id = ?";
+                ResultSet tempRs;
+                try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                    pstmt.setString(1, id);
+
+                    tempRs = pstmt.executeQuery();
+
+                    while(tempRs.next()) {
+                        menu.put(tempRs.getString(1), tempRs.getDouble(2));
+                    }
+                }
+
+                input = "SELECT tag_type, tag_value FROM tags WHERE restaurant_id = ?";
+                try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                    pstmt.setString(1, id);
+
+                    tempRs = pstmt.executeQuery();
+
+                    while(tempRs.next()) {
+                        tags.put(tempRs.getString(1), tempRs.getString(2));
+                    }
+                }
+                restr.put(id, new Restaurant(rs.getString(2), rs.getString(3), menu, tags));
+            }
+        } catch(Exception e) {
+            System.out.println(e);
+        }
+
+        return restr;
+    }
+
+    /**
      * Add a rating to the database
      * @param userId The user's id
      * @param restrId The restaurant's id
@@ -366,47 +417,62 @@ public interface Helpers {
      * @return The user's ratings
      */
     public static String[][] getUserRatings(String userId) {
-        Connection con;
+        Connection con = null;
         String[][] ratings = null;
 
         try {
             con = DriverManager.getConnection(DB);
 
-            ResultSet rs = null;
             String input = "SELECT restaurant_id, rating_type, rating FROM ratings WHERE user_id = ?";
-            try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                pstmt.setString(1, userId);
-                rs = pstmt.executeQuery();
-            }
-
             ArrayList<String> types = new ArrayList<>();
             ArrayList<String> rates = new ArrayList<>();
-            while(rs.next()) {
-                String restrId = rs.getString(1);
-                String tag = CONVERT.get(rs.getString(2));
-                String tag_value = null;
 
-                input = "SELECT tag_value FROM tags WHERE restaurant_id = ? and tag_type = ?";
-                try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                    pstmt.setString(1, restrId);
-                    pstmt.setString(2, tag);
-                    tag_value = pstmt.executeQuery().getString(1);
+            try (PreparedStatement pstmt = con.prepareStatement(input)) {
+                pstmt.setString(1, userId);
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    while(rs.next()) {
+                        String restrId = rs.getString("restaurant_id");
+                        String tag = CONVERT.get(rs.getString("rating_type"));
+                        String tagValue = null;
+        
+                        input = "SELECT tag_value FROM tags WHERE restaurant_id = ? and tag_type = ?";
+                        try (PreparedStatement tagPstmt = con.prepareStatement(input)) {
+                            tagPstmt.setString(1, restrId);
+                            tagPstmt.setString(2, tag);
+                            try (ResultSet tagsRs = tagPstmt.executeQuery()) {
+                                if (tagsRs.next()) {
+                                    tagValue = tagsRs.getString("tag_value");
+                                }
+                            }
+                        }
+
+                        if (tagValue != null) {
+                            types.add(tagValue);
+                            rates.add(rs.getString("rating"));
+                        }
+                    }
+
                 }
-
-                types.add(tag_value);
-                rates.add(rs.getString(3));
             }
-
             ratings = new String[2][types.size()];
-            ratings[0] = types.toArray(ratings[0]);
-            ratings[1] = rates.toArray(ratings[1]);
+            for (int i = 0; i < types.size(); i++) {
+                ratings[0][i] = types.get(i);
+                ratings[1][i] = rates.get(i);
+            }
 
         } catch(Exception e) {
             System.out.println(e);
+        } finally {
+            if (con != null ) {
+                try {
+                    con.close();
+                } catch(Exception e) {
+                    System.out.println(e);
+                }
+            }
         }
         return ratings;
     }
-
 
     /**
      * Gets the restaurant's ratings from the database
@@ -414,41 +480,57 @@ public interface Helpers {
      * @return The restaurant's ratings
      */
     public static String[][] getRestrRatings(String restrId) {
-        Connection con;
+        Connection con = null;
         String[][] ratings = null;
 
         try {
             con = DriverManager.getConnection(DB);
 
-            ResultSet rs = null;
             String input = "SELECT rating_type, rating FROM ratings WHERE restaurant_id = ?";
-            try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                pstmt.setString(1, restrId);
-                rs = pstmt.executeQuery();
-            }
-
             ArrayList<String> types = new ArrayList<>();
             ArrayList<String> rates = new ArrayList<>();
-            while(rs.next()) {
-                String tag = CONVERT.get(rs.getString(1));
-                String tag_value = null;
 
-                input = "SELECT tag_value FROM tags WHERE restaurant_id = ? and tag_type = ?";
-                try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                    pstmt.setString(1, restrId);
-                    pstmt.setString(2, tag);
-                    tag_value = pstmt.executeQuery().getString(1);
+            try (PreparedStatement pstmt = con.prepareStatement(input)) {
+                pstmt.setString(1, restrId);
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    while(rs.next()) {
+                        String tag = CONVERT.get(rs.getString("rating_type"));
+                        String tagValue = null;
+        
+                        input = "SELECT tag_value FROM tags WHERE restaurant_id = ? and tag_type = ?";
+                        try (PreparedStatement tagPstmt = con.prepareStatement(input)) {
+                            tagPstmt.setString(1, restrId);
+                            tagPstmt.setString(2, tag);
+                            try (ResultSet tagsRs = tagPstmt.executeQuery()) {
+                                if (tagsRs.next()) {
+                                    tagValue = tagsRs.getString("tag_value");
+                                }
+                            }
+                        }
+                        
+                        if (tagValue != null) {
+                            types.add(tagValue);
+                            rates.add(rs.getString("rating"));
+                        }
+                    }
                 }
-
-                types.add(tag_value);
-                rates.add(rs.getString(2));
             }
 
             ratings = new String[2][types.size()];
-            ratings[0] = types.toArray(ratings[0]);
-            ratings[1] = rates.toArray(ratings[1]);
+            for (int i = 0; i < types.size(); i++) {
+                ratings[0][i] = types.get(i);
+                ratings[1][i] = rates.get(i);
+            }
         } catch(Exception e) {
             System.out.println(e);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
+            }
         }
         return ratings;
     }

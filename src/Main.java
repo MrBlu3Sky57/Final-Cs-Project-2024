@@ -5,30 +5,29 @@ import java.util.Map;
 public class Main {
     public static void main(String[] args) throws Exception {
         Map<String, User> users = new HashMap<String, User>();
-        Helpers.addUser("Aaron", "password", users);
+        Helpers.addUser("Tudor", "password2", users);
         users = Helpers.getUsers();
 
-        for (Map.Entry<String, User> pair : users.entrySet()) {
-            System.out.println("ID: " + pair.getKey() + " || USERNAME: " + pair.getValue().getUsername() + "|| PASSWORD: " + pair.getValue().getPassword() + "\n");
-        }
 
         // Map<String, Restaurant> restaurants = new HashMap<String, Restaurant>();
-        // String name = "Zakushi";
-        // String location = "193 Carlton St.";
+        // String name = "WVRST";
+        // String location = "609 King St W.";
         // Map<String, Double> menu = new HashMap<String, Double>();
-        // menu.put("P-Toro", 4.30);
-        // menu.put("Tsukune", 3.50);
-        // menu.put("Goma Ae", 5.50);
+        // menu.put("Belgian Fries", 10.00);
+        // menu.put("Berkshire Sausage", 15.00);
+        // menu.put("Tamworth Sausage", 13.00);
         
         // Map<String, String> tags = new HashMap<String, String>();
-        // tags.put("Cuisine", "Japanese");
+        // tags.put("Cuisine", "German");
         // tags.put("Ambiance", "Lively");
-        // tags.put("Price", "Moderately Expensive");
+        // tags.put("Price", "Moderately-Expensive");
         // tags.put("Style", "Casual");
+        
+        Map<String, Restaurant> restr = Helpers.getRestr();
+        String[] recs = Recommend.smartRecommend(restr, Helpers.getUserId("Aaron"));
 
-        // Helpers.addRestaurant(name, location, menu, tags, restaurants);
-        
-        Helpers.addRating(Helpers.getUserId("Aaron"), Helpers.getRestrId("Zakushi"), "Taste", 5);
-        
+        for (String id : recs) {
+            System.out.println(id + "|| " + restr.get(id).getName() + "|| " + restr.get(id).getLocation());
+        }
     }     
 }

@@ -1,5 +1,6 @@
 import java.util.Map;
 import java.util.Set;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public interface Recommend {
@@ -77,14 +78,26 @@ public interface Recommend {
      * @param key The key by which to sort the array
      */
     public static void sort(String[] arr, Map<String, Double> key) {
-        int size, left;
+        if (arr == null || arr.length < 2) {
+            return;
+        } else {
+            mergeSort(arr, 0, arr.length - 1, key);
+        }
+    }
 
-        for (size = 1; size <= arr.length; size = 2 * size) {
-            for (left = 0; left < arr.length - 1; left += 2*size) {
-                int mid = Math.min(left + size - 1, arr.length - 1);
-                int right = Math.min(left + 2*size - 1, arr.length-1);
-                merge(arr, left, mid, right, key);
-            }
+    /**
+     * The recursive sorting function
+     * @param arr The array to sort
+     * @param left The left bound
+     * @param right The right bound
+     * @param key The key by which to sort the array
+     */
+    public static void mergeSort(String[] arr, int left, int right, Map<String, Double> key) {
+        if (left < right) {
+            int mid = (left + right) / 2;
+            mergeSort(arr, left, mid, key);
+            mergeSort(arr, mid + 1, right, key);
+            merge(arr, left, mid, right, key);
         }
     }
 
@@ -142,9 +155,9 @@ public interface Recommend {
     /**
      * Gets the top 50 highest rated restaurants on average
      * @param restaurants The restaurants map
-     * @return The map of the top 50 restaurants
+     * @return The ids of the top 50 restaurants
      */
-    public static Map<String, Restaurant> avgRecommend(Map<String, Restaurant> restaurants) {
+    public static String[] avgRecommend(Map<String, Restaurant> restaurants) {
         Map<String, Double> netAvgRatings = new HashMap<String, Double>();
 
         Set<String> keySet = restaurants.keySet();
@@ -172,9 +185,9 @@ public interface Recommend {
             numReturn = 50;
         }
 
-        Map<String, Restaurant> recs = new HashMap<String, Restaurant>();
+        String[] recs = new String[numReturn];
         for (int i = 0; i < numReturn; i++) {
-            recs.put(ids[i], restaurants.get(ids[i]));
+            recs[i] = ids[i];
         }
 
         return recs;
@@ -184,9 +197,9 @@ public interface Recommend {
      * Get the recommendations for a user based on their preferences
      * @param restaurants The restaurants map
      * @param user_id The user id
-     * @return The top new restaurants for the user.
+     * @return The top new restaurants for the user by id.
      */
-    public static Map<String, Restaurant> smartRecommend(Map<String, Restaurant> restaurants, String user_id) {
+    public static String[] smartRecommend(Map<String, Restaurant> restaurants, String user_id) {
         String[][] userRatings = Helpers.getUserRatings(user_id);
         Map<String, Double> weights = getWeights(userRatings);
         Map<String, Double> netRatings = new HashMap<String, Double>();
@@ -201,7 +214,11 @@ public interface Recommend {
 
             Double net = 0.0;
             for (String key : avgRating.keySet()) {
-                net += avgRating.get(key) * weights.get(key);
+                if (weights.containsKey(key)) {
+                    net += avgRating.get(key) * weights.get(key);
+                } else {
+                    net += avgRating.get(key);
+                }
             }
             
             netRatings.put(id, net);
@@ -209,18 +226,16 @@ public interface Recommend {
 
         sort(ids, netRatings);
 
-        int numReturn = 0;
-        if (ids.length < 50) {
-            numReturn = ids.length;
-        } else {
-            numReturn = 50;
+        ArrayList<String> temp = new ArrayList<>();
+        for (int i = 0; i < ids.length; i++) {
+            if (!Helpers.rated(user_id, ids[i])) {
+                temp.add(ids[i]);
+            }
         }
 
-        Map<String, Restaurant> recs = new HashMap<String, Restaurant>();
-        for (int i = 0; i < numReturn; i++) {
-            if (!Helpers.rated(user_id, ids[1])) {
-                recs.put(ids[i], restaurants.get(ids[i]));
-            }
+        String[] recs = new String[temp.size()];
+        for (int i = 0; i < temp.size(); i++) {
+            recs[i] = temp.get(i);
         }
 
         return recs;
