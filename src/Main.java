@@ -1,3 +1,5 @@
+// Testing stuff
+
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -5,7 +7,7 @@ import java.util.Map;
 public class Main {
     public static void main(String[] args) throws Exception {
         Map<String, User> users = new HashMap<String, User>();
-        Helpers.addUser("Tudor", "password2", users);
+        Helpers.addUser("jim", "password4", users);
         users = Helpers.getUsers();
 
 
@@ -23,8 +25,9 @@ public class Main {
         // tags.put("Price", "Moderately-Expensive");
         // tags.put("Style", "Casual");
         
+        Helpers.addRating(Helpers.getUserId("jim"), Helpers.getRestrId("Zakushi"), "Taste", 1.5);
         Map<String, Restaurant> restr = Helpers.getRestr();
-        String[] recs = Recommend.smartRecommend(restr, Helpers.getUserId("Aaron"));
+        String[] recs = Recommend.avgRecommend(restr, restr.size());
 
         for (String id : recs) {
             System.out.println(id + "|| " + restr.get(id).getName() + "|| " + restr.get(id).getLocation());

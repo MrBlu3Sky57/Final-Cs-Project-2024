@@ -1,3 +1,5 @@
+// File Header Comment
+
 import java.util.Map;
 import java.util.Set;
 import java.util.ArrayList;
@@ -183,6 +185,48 @@ public interface Recommend {
             numReturn = ids.length;
         } else {
             numReturn = 50;
+        }
+
+        String[] recs = new String[numReturn];
+        for (int i = 0; i < numReturn; i++) {
+            recs[i] = ids[i];
+        }
+
+        return recs;
+    }
+
+        /**
+     * Gets the top n highest rated restaurants on average
+     * @param restaurants The restaurants map
+     * @param numReturns The number, n, of restaurants to return
+     * @return The ids of the top n restaurants
+     */
+    public static String[] avgRecommend(Map<String, Restaurant> restaurants, int numReturns) {
+        Map<String, Double> netAvgRatings = new HashMap<String, Double>();
+
+        Set<String> keySet = restaurants.keySet();
+        String[] ids = new String[keySet.size()];
+        ids = keySet.toArray(ids);
+        for (String id : ids) {
+            String[][] restrRatings = Helpers.getRestrRatings(id);
+            Map<String, Double> avgRatings = getAvgRatings(restrRatings);
+
+            Double avg = 0.0;
+            for (Double rating : avgRatings.values()) {
+                avg += rating;
+            }
+            avg = avg / (double) avgRatings.size();
+
+            netAvgRatings.put(id, avg);
+        }
+
+        sort(ids, netAvgRatings);
+
+        int numReturn = 0;
+        if (ids.length < numReturns) {
+            numReturn = ids.length;
+        } else {
+            numReturn = numReturns;
         }
 
         String[] recs = new String[numReturn];
