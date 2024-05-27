@@ -132,18 +132,18 @@ public interface Recommend {
         k = l;
         while (i < n1 && j < n2) {
             if (key.get(half1[i]) >= key.get(half2[j])) {
-                arr[k] = half1[i];
+                arr[k] = half1[i]; 
                 i++;
             } else {
-                arr[k] = half2[j];
+                arr[k] = half2[j]; 
                 j++;
             }
             k++;
         }
 
         while (i < n1) {
-            arr[k] = half1[i];
-            i++;
+            arr[k] = half1[i]; 
+            i++; 
             k++;
         }
 
