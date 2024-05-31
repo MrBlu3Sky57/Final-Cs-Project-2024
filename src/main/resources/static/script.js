@@ -1,6 +1,5 @@
 document.getElementById('searchForm').addEventListener('submit', function(event) {
     event.preventDefault();
-    console.log("Hello");
 
     const formData = new FormData(this);
     const name = formData.get('name');
@@ -18,6 +17,11 @@ document.getElementById('searchForm').addEventListener('submit', function(event)
 })
 
 function updateSearch(data) {
-    console.log('lol', data)
-    document.getElementById('body').innerHTML = `<h4> ${data} </h4>`;
+    if (data.error) {
+        console.log(data) 
+        document.getElementById('error').innerHTML = `<h4> ${data.message} </h4>`;
+        document.getElementById('body').innerHTML = ``;
+    } else {
+        document.getElementById('body').innerHTML = `<h4> ${data.userId} </h4>`;
+    }
 }
