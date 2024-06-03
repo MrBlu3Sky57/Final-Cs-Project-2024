@@ -1,5 +1,6 @@
 document.getElementById('searchForm').addEventListener('submit', function(event) {
     event.preventDefault();
+    console.log('New Hello')
 
     const formData = new FormData(this);
     const name = formData.get('name');
@@ -9,7 +10,6 @@ document.getElementById('searchForm').addEventListener('submit', function(event)
     fetch(`/search?${queryString}`)
     .then(response => response.json())
     .then (data => {
-        console.log(data);
         updateSearch(data);
     })
     .catch(error => console.error('Error:', error));
