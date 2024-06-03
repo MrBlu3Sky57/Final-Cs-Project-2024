@@ -402,7 +402,7 @@ public interface Helpers {
         try {
             con = DriverManager.getConnection(DB);
 
-            String input = "SELECT id FROM restaurants WHERE name = ?";
+            String input = "SELECT id FROM restaurants WHERE name like ?";
             try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 pstmt.setString(1, restrName);
                 id = pstmt.executeQuery().getString(1);
