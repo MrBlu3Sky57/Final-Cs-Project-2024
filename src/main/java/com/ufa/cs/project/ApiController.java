@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ApiController {
     Map<String, Restaurant> restaurants = null;
     Map<String, User> users = null;
+    String current_user = "";
 
     public ApiController() {
         if (restaurants == null) {
@@ -23,7 +24,12 @@ public class ApiController {
             users = Helpers.getUsers();
         }
     }
-
+    
+    // @GetMapping("/login")
+    // public SomeData getMethodName(@RequestParam String param) {
+    //     return new SomeData();
+    // }
+    
 
     @GetMapping(path="/search")
     public ResponseEntity<Object> search(@RequestParam(name="name") String name) {

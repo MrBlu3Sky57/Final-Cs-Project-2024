@@ -8,7 +8,7 @@ import java.sql.*;
 
 public interface Helpers {
     final static String[] TAG_TYPES = {"Cuisine", "Ambiance", "Price", "Style"};
-    final static String[] RATING_TYPES = {"Taste", "Ambiance", "WorthIt", "Enjoy", "Hygiene", "Service"};
+    final static String[] RATING_TYPES = {"Taste", "Ambiance", "Worth The Price?", "Enjoyment", "Hygiene", "Service"};
     final static Map<String, String> CONVERT = Map.of(
             RATING_TYPES[0], TAG_TYPES[0],
             RATING_TYPES[1], TAG_TYPES[1],
