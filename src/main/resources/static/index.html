@@ -11,69 +11,14 @@
     <script src="script.js" defer></script>
 </head>
 <body>
-    <div id="title">
+    <div id="title" class="container-fluid py-5 text-center">
         <h1>Restaurant Tracker</h1>
     </div>
     <div id="error">
 
     </div>
-    <div id="body">
-        <div id="welcomeMessage">
-            <p>Welcome to Restaurant Tracker! You can search, rate and get recommendations for restaurants in the GTA!</p>
-        </div>        
-        <div id="message">
-        </div>
+    <div id="login" class="container-fluid py-5 text-center">
         
-        <button id="1">Search Restaurants</button>
-        <div id="hiddenContent1" style="display:none">
-        <h3>Search Restaurant by Name</h3>
-        <form id="searchForm">
-            <label for="name">Restaurant Name</label>
-            <input id="name" name="name" type="text">
-            <button type="submit" class="btn btn-default">Search</button>
-        </form>
-        </div>
-
-        <button id="2">Rate Restaurants</button>
-        <div id="hiddenContent2" style="display:none">
-        <h3>Rate a Restaurant</h3>
-        <form id="rateForm">
-            <label for="name">Restaurant Name</label>
-            <input id="name" name="name" type="text">
-            <label for="rating_type">Type of Rating</label>
-            <select id="rating_type" name="rating_type">
-                <option value="Taste">Taste</option>
-                <option value="Ambiance">Ambiance</option>
-                <option value="Worth The Price?">Worth The Price</option>
-                <option value="Enjoyment">Enjoyment</option>
-                <option value="Hygiene">Hygiene</option>
-                <option value="Service">Service</option>
-            </select>
-            <label for="rating">Rating</label>
-            <select id="rating" name="rating">
-                <option value="0">0</option>
-                <option value="0.5">0.5</option>
-                <option value="1">1</option>
-                <option value="1.5">1.5</option>
-                <option value="2">2</option>
-                <option value="2.5">2.5</option>
-                <option value="3">3</option>
-                <option value="3.5">3.5</option>
-                <option value="4">4</option>
-                <option value="4.5">4.5</option>
-                <option value="5">5</option>
-            </select>
-            <button type="submit" class="btn btn-default">Search</button>
-        </form>
-        </div>
-
-        <button id="3">Get Recommendations</button>
-        <div id="hiddenContent3" style="display:none">
-            <button id="smartRecommend">Personalized Recommendations</button>
-            <button id="avgRecommend">General Recommendations</button>
-        </div>
-        <div id="data">
-        </div>
     </div>
 
 
