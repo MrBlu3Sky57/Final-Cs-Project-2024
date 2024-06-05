@@ -85,6 +85,30 @@ public interface Helpers {
         return true;
     }
 
+    public static boolean authenticateUser(String username, String password) {
+        Connection con;
+        int numUsers;
+        
+        try {
+            con = DriverManager.getConnection(DB);
+
+            String input = "SELECT COUNT(*) FROM users WHERE username = ? and password = ?";
+            try (PreparedStatement pstmt = con.prepareStatement(input)) {
+                pstmt.setString(1, username);
+                pstmt.setString(2, password);
+
+                numUsers = pstmt.executeQuery().getInt(1);
+            }
+
+            if (numUsers == 0) {
+                return false;
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return true;
+    }
+
     /**
      * Get all of the users in the Database
      * @return A Map of user id's to their user objects

@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,8 +25,21 @@ public class ApiController {
         }
     }
     
-    @GetMapping("/login")
-    public void getMethodName(@RequestParam String param) {
+    @PostMapping("/login")
+    public ResponseEntity<Object> login(@RequestParam(name="username") String username, @RequestParam(name="password") String password) {
+        System.out.println(username + password);
+        boolean status = Helpers.authenticateUser(username, password);
+        System.out.println(status);
+        Map<String, Object> responseBody = new HashMap<String, Object>();
+    
+        if (status) {
+            responseBody.put("verification", true);
+            responseBody.put("id", Helpers.checkUser(username));
+            return new ResponseEntity<Object>(responseBody, HttpStatus.OK);
+        } else {
+            responseBody.put("verification", false);
+            return new ResponseEntity<Object>(responseBody, HttpStatus.NOT_FOUND);
+        }
     }
     
 
