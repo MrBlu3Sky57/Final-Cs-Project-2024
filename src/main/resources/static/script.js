@@ -14,7 +14,7 @@ if (localStorage.getItem("id") !== null) {
             </form>
             <div class="mb-3">
                 <br>
-                <button id="signUp" class="btn btn-primary">Don't Have an Account? Sign up!</button>
+                <button id="signUp" class="btn btn-primary" onClick="logout">Don't Have an Account? Sign up!</button>
             </div>
             <div class="mb-3">
             <br>
@@ -23,7 +23,7 @@ if (localStorage.getItem("id") !== null) {
         </div>
         `;
 
-    document.getElementById('loginForm').addEventListener('submit', function(event) {
+    document.getElementById('loginForm').onClick(function(event) {
         event.preventDefault();
 
         const formData = new FormData(this);
@@ -187,15 +187,8 @@ function multiRestaurantFormat(restaurants, ratings) {
     return output
 }
 
-console.log("testing 1");
-document.addEventListener("DOMContentLoaded", (event) => {
-    console.log("testing 2");
-    document.getElementById('logout').addEventListener('click', function(event) {
-        console.log("testing 3");
-        event.preventDefault();
-        console.log("testing 4");
-        localStorage.removeItem('id');
-        console.log("testing 5");
-        window.location.replace('/');
-    });
-});
+
+function logout() {
+    localStorage.removeItem('id');
+    window.location.replace('/');
+}
