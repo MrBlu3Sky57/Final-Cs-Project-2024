@@ -8,7 +8,7 @@ import java.sql.*;
 
 public interface Helpers {
     final static String[] TAG_TYPES = {"Cuisine", "Ambiance", "Price", "Style"};
-    final static String[] RATING_TYPES = {"Taste", "Ambiance", "Worth The Price?", "Enjoyment", "Hygiene", "Service"};
+    final static String[] RATING_TYPES = {"Taste", "Ambiance", "WorthIt", "Enjoy", "Hygiene", "Service"};
     final static Map<String, String> CONVERT = Map.of(
             RATING_TYPES[0], TAG_TYPES[0],
             RATING_TYPES[1], TAG_TYPES[1],
@@ -219,7 +219,7 @@ public interface Helpers {
         try {
             con = DriverManager.getConnection(DB);
 
-            String input = "SELECT COUNT(*) FROM restaurants WHERE name = ?";
+            String input = "SELECT COUNT(*) FROM restaurants WHERE name like ?";
             try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 pstmt.setString(1, restrName);
                 numRestr = pstmt.executeQuery().getInt(1);
@@ -278,6 +278,8 @@ public interface Helpers {
                     }
                 }
                 restr.put(id, new Restaurant(rs.getString(2), rs.getString(3), menu, tags));
+                menu.clear();
+                tags.clear();
             }
         } catch(Exception e) {
             System.out.println(e);

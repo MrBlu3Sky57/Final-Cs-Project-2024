@@ -8,7 +8,6 @@ import java.util.HashMap;
 
 public interface Recommend {
 
-
     /**
      * Gets the weight of each tag for a user to determine their preferences
      * @param userRatings All of the user's ratings, storing tag value in parallel to rating
@@ -44,7 +43,7 @@ public interface Recommend {
 
     /**
      * Get the average rating for a restaurant for each tag value
-     * @param restrRatings Map of restaurant tag value and rating
+     * @param restrRatings An array of restaurant tag value and rating
      * @return The average rating for a restaurant for each of its tag values
      */
     public static Map<String, Double> getAvgRatings(String[][] restrRatings) {
@@ -275,6 +274,9 @@ public interface Recommend {
         for (int i = 0; i < ids.length; i++) {
             if (!Helpers.rated(user_id, ids[i])) {
                 temp.add(ids[i]);
+                if (temp.size() == 5) {
+                    break;
+                }
             }
         }
 
