@@ -224,7 +224,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (data.success) {
                         window.location.replace('/');
                     } else {
-                        document.getElementById('error').innerHTML = '<h4>Sorry this restaurant does not exist in our records</h4>';
+                        document.getElementById('title').innerHTML += '<br><h3>Sorry this restaurant does not exist in our records</h3>';
                     }
                 })
                 .catch(error => console.error('Error:', error));
