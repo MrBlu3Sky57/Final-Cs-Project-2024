@@ -190,6 +190,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(response => response.json())
                 .then(data => {
                     updateSearch(data);
+                    backToMainMenu()
                 })
                 .catch(error => console.error('Error:', error));
             });
@@ -245,6 +246,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('main').innerHTML = `<h4>Here are some popular restaurants you might like:</h4><br><h4>${multiRestaurantFormat(data.restaurant, data.ratings)}</h4>`;
+                    backToMainMenu();
                 })
                 .catch(error => console.error('Error:', error));
             });
@@ -257,6 +259,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('main').innerHTML = `<h4>Here are some popular restaurants you might like based on your preferences:</h4><br><h4>${multiRestaurantFormat(data.restaurant, data.ratings)}</h4>`;
+                    backToMainMenu();
                 })
                 .catch(error => console.error('Error:', error));
             });
@@ -325,5 +328,13 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log('Logout');
         localStorage.removeItem('id');
         window.location.replace('/');
+    }
+
+    function backToMainMenu() {
+        document.getElementById('main').innerHTML += `<div><br><br><button id="backToMainMenu" class="btn btn-primary">Main Menu</button></div>`;
+
+        document.getElementById('backToMainMenu').addEventListener('click', function (event) {
+            window.location.replace('/');
+        });
     }
 });
