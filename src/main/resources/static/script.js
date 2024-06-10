@@ -287,8 +287,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function updateSearch(data) {
         if (data.error) {
-            document.getElementById('error').innerHTML = `<h3> ${data.error_message} </h3>`;
-            document.getElementById('main').innerHTML = `<h4>Here are some other popular restaurants you might like:</h4><br><h4>${multiRestaurantFormat(data.restaurant, data.ratings)}</h4>`;
+            document.getElementById('title').innerHTML += `<h3> ${data.error_message} </h3>`;
+            document.getElementById('main').innerHTML = `<h4><br>Here are some other popular restaurants you might like:</h4><br><h4>${multiRestaurantFormat(data.restaurant, data.ratings)}</h4>`;
         } else {
             document.getElementById('main').innerHTML = `<h4>${restaurantFormat(data.restaurant, data.ratings)}</h4>`;
         }
