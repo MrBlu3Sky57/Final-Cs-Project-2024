@@ -105,6 +105,7 @@ public interface Helpers {
             }
         } catch (Exception e) {
             System.out.println(e);
+            return false;
         }
         return true;
     }
