@@ -1,4 +1,11 @@
-// File header comment
+/*
+ * The user class allows you to instantiate user objects
+ * that store all of the restaurant data: username and password.
+ * 
+ *  Completely Programmed by Aaron Avram
+ *  Date Programmed: June 14, 2024
+ */
+
 package com.ufa.cs.project;
 
 public class User {

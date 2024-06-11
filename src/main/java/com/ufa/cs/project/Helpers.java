@@ -1,4 +1,11 @@
-// File Header Comment
+/*
+ * This a class with methods that implement database retrieval, insertion and verification
+ * for the Restaurant Tracker app. 
+ * 
+ *  Completely Programmed by Aaron Avram
+ *  Date Programmed: June 14, 2024
+ */
+
 package com.ufa.cs.project;
 
 import java.util.Map;
@@ -6,7 +13,7 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.sql.*;
 
-public interface Helpers {
+public class Helpers {
     final static String[] TAG_TYPES = {"Cuisine", "Ambiance", "Price", "Style"};
     final static String[] RATING_TYPES = {"Taste", "Ambiance", "WorthIt", "Enjoy", "Hygiene", "Service"};
     final static Map<String, String> CONVERT = Map.of(
@@ -361,7 +368,7 @@ public interface Helpers {
         return true;
     }
 
-        /**
+    /**
      * Check if a user has already rated a restaurant for a specific rating type
      * @param userId User id
      * @param restrId Restaurant id

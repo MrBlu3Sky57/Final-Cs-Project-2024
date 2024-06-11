@@ -1,3 +1,10 @@
+/*
+ * The application class for the Restaurant Tracker app. This is what runs the code and initializes the server
+ * 
+ *  Completely Programmed by Aaron Avram
+ *  Date Programmed: June 14, 2024
+ */
+
 package com.ufa.cs.project;
 
 import org.springframework.boot.SpringApplication;

@@ -1,10 +1,27 @@
+/*
+ *  Script File that controls website HTTP requests
+ *
+ *  Completely Programmed by Aaron Avram
+ *  Date Programmed: June 14, 2024
+ */
+
+// Event Listener for the DOM Content
 document.addEventListener('DOMContentLoaded', function () {
+
+    // If there is no current user go to login page
     if (localStorage.getItem("id") !== null) {
-        setupLoggedInView();
-    } else {
+        setupLoggedInView();  
+    } 
+    
+    // If there is a current user go to logged in page
+    else {
         setupLoginView();
     }
 
+    /**
+     * Gives user the login page so they can enter their username and password
+     * or sign up with a new account
+     */
     function setupLoginView() {
         document.getElementById('main').innerHTML = `
             <div class="mb-3">
@@ -29,6 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
         `;
 
+        // Event Listener for login form
         document.getElementById('loginForm').addEventListener('submit', function (event) {
             event.preventDefault();
 
@@ -36,7 +54,10 @@ document.addEventListener('DOMContentLoaded', function () {
             const username = formData.get('username');
             const password = formData.get('password');
 
+            // Create HTTP request body
             const queryString = `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`;
+
+            // Send request and wait for response
             fetch(`/login`, {
                 method: 'POST',
                 headers: {
@@ -44,6 +65,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 body: queryString
             })
+
+            // Parse response and update website
             .then(response => response.json())
             .then(data => {
                 checkLogin(data);
@@ -51,7 +74,10 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('Error:', error));
         });
 
+        // Event listener for signUp
         document.getElementById('signUp').addEventListener('click', function(event) {
+
+            // If user clicks on signUp, display sign up page
             document.getElementById('main').innerHTML = `
             <div class="mb-3">
                 <h5>Make a Restaurant Tracker Account</h5>
@@ -71,6 +97,7 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
             `;
 
+            // Event listener for the sign up form
             document.getElementById('signUpForm').addEventListener('submit', function (event) {
                 event.preventDefault();
     
@@ -78,7 +105,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 const username = formData.get('username');
                 const password = formData.get('password');
     
+                // Create HTTP request body
                 const queryString = `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`;
+
+                // Send request and wait for response
                 fetch(`/signUp`, {
                     method: 'POST',
                     headers: {
@@ -86,6 +116,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     },
                     body: queryString
                 })
+
+                // Parse response and update website
                 .then(response => response.json())
                 .then(data => {
                     checkSignUp(data);
@@ -95,6 +127,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Display the web content for a user who is logged in
     function setupLoggedInView() {
         document.getElementById('main').innerHTML = `
             <div id="welcomeMessage" class="mb-3">
@@ -169,24 +202,32 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
         `;
 
+        // When user presses on the logout button, call the logout function
         document.getElementById('logout').addEventListener('click', logout);
 
+        // Event listener for the search
         document.getElementById('searchButton').addEventListener('click', function(event) {
+            // Toggle display based on button pressing
             if (document.getElementById('hiddenSearch').style.display === 'none') {
                 document.getElementById('hiddenSearch').style.display = 'block';
             } else {
                 document.getElementById('hiddenSearch').style.display = 'none';
             }
             
+            // Event listener for the search form
             document.getElementById('searchForm').addEventListener('submit', function (event) {
                 event.preventDefault();
     
                 const formData = new FormData(this);
                 const name = formData.get('name');
     
+                // Create HTTP request body
                 const queryString = `id=${encodeURIComponent(localStorage.getItem("id"))}&name=${encodeURIComponent(name)}`;
     
+                // Send request and wait for response
                 fetch(`/search?${queryString}`)
+
+                // parse response and update website
                 .then(response => response.json())
                 .then(data => {
                     updateSearch(data);
@@ -196,13 +237,16 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         })
 
+        // Event listener for the rate button
         document.getElementById('rateButton').addEventListener('click', function(event) {
+            // Toggle display based on button pressing
             if (document.getElementById('hiddenRate').style.display === 'none') {
                 document.getElementById('hiddenRate').style.display = 'block';
             } else {
                 document.getElementById('hiddenRate').style.display = 'none';
             }
             
+            // Event listener for the rate form
             document.getElementById('rateForm').addEventListener('submit', function (event) {
                 event.preventDefault();
 
@@ -211,7 +255,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 const rating_type = formData.get('rating_type');
                 const rating = formData.get('rating');
     
+                // Create HTTP request body
                 const queryString = `rating_type=${encodeURIComponent(rating_type)}&rating=${encodeURIComponent(rating)}&user_id=${encodeURIComponent(localStorage.getItem('id'))}&restr_name=${encodeURIComponent(restr_name)}`;
+                
+                // Send request and wait for response
                 fetch(`/rate`, {
                     method: 'POST',
                     headers: {
@@ -219,6 +266,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     },
                     body: queryString
                 })
+
+                // Parse response and update website
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -231,18 +280,23 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         })
 
+        // Event listener for the recommend button
         document.getElementById('recommendButton').addEventListener('click', function(event) {
-            
+            // Toggle display based on button pressing
             if (document.getElementById('hiddenRecommend').style.display === 'none') {
                 document.getElementById('hiddenRecommend').style.display = 'block';
             } else {
                 document.getElementById('hiddenRecommend').style.display = 'none';
             }
             
+            // Event Listener for average recommend button
             document.getElementById('avgRecommend').addEventListener('click', function (event) {
                 event.preventDefault();
     
+                // Send HTTP request and wait for response
                 fetch('/avgRecommend')
+
+                // Parse response and update page
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('main').innerHTML = `<h4>Here are some popular restaurants you might like:</h4><br><h4>${multiRestaurantFormat(data.restaurant, data.ratings)}</h4>`;
@@ -251,11 +305,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 .catch(error => console.error('Error:', error));
             });
 
+            // Event listener for the smart recommend button
             document.getElementById('smartRecommend').addEventListener('click', function (event) {
                 event.preventDefault();
+
+                // Create HTTP request body
                 const queryString = `user_id=${encodeURIComponent(localStorage.getItem('id'))}`;
 
+                // Send request and wait for response
                 fetch(`/smartRecommend?${queryString}`)
+
+                // Parse response and update website
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('main').innerHTML = `<h4>Here are some popular restaurants you might like based on your preferences:</h4><br><h4>${multiRestaurantFormat(data.restaurant, data.ratings)}</h4>`;
@@ -266,6 +326,10 @@ document.addEventListener('DOMContentLoaded', function () {
         })
     }
 
+    /**
+     * Checks if a user was successfully logged in or not
+     * @param {*} data The container for the verification and id values
+     */
     function checkLogin(data) {
         if (data.verification) {
             localStorage.setItem('id', data.id);
@@ -275,6 +339,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    /**
+     * Checks if a user was successfully signed up
+     * @param {*} data The container for the verification and id values
+     */
     function checkSignUp(data) {
         if (data.verification) {
             localStorage.setItem('id', data.id);
@@ -285,6 +353,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    /**
+     * Updates the website to display the search results
+     * @param {*} data The container for the error verifier, error message and restaurant data
+     */
     function updateSearch(data) {
         if (data.error) {
             document.getElementById('title').innerHTML += `<h3> ${data.error_message} </h3>`;
@@ -294,6 +366,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    /**
+     * Formats a restaurant on the website
+     * @param {*} restaurant The restaurant data
+     * @param {*} ratings The restaurant's rating data
+     * @returns The html containing the new data
+     */
     function restaurantFormat(restaurant, ratings) {
         console.log(ratings);
 
@@ -313,6 +391,12 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
     }
 
+    /**
+     * Formats multiple restaurants on the website
+     * @param {*} restaurants The restaurant data
+     * @param {*} ratings The restaurant rating data
+     * @returns The html containing the new data
+     */
     function multiRestaurantFormat(restaurants, ratings) {
         let output = `<ol>`;
 
@@ -324,12 +408,18 @@ document.addEventListener('DOMContentLoaded', function () {
         return output;
     }
 
+    /**
+     * Logs the user out of the website
+     */
     function logout() {
         console.log('Logout');
         localStorage.removeItem('id');
         window.location.replace('/');
     }
 
+    /**
+     * Routes the user back to the main menu
+     */
     function backToMainMenu() {
         document.getElementById('main').innerHTML += `<div><br><br><button id="backToMainMenu" class="btn btn-primary">Main Menu</button></div>`;
 

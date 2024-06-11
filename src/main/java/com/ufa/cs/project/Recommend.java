@@ -1,4 +1,11 @@
-// File Header Comment
+/*
+ * This a class with methods that implement sorting and calculations for the recommendations
+ * on the Restaurant Tracker app. 
+ * 
+ *  Completely Programmed by Aaron Avram
+ *  Date Programmed: June 14, 2024
+ */
+
 package com.ufa.cs.project;
 
 import java.util.Map;
@@ -6,7 +13,7 @@ import java.util.Set;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public interface Recommend {
+public class Recommend {
 
     /**
      * Gets the weight of each tag for a user to determine their preferences
@@ -195,7 +202,7 @@ public interface Recommend {
         return recs;
     }
 
-        /**
+    /**
      * Gets the top n highest rated restaurants on average
      * @param restaurants The restaurants map
      * @param numReturns The number, n, of restaurants to return

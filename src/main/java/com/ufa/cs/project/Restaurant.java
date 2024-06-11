@@ -1,4 +1,11 @@
-// File header comment
+/*
+ * The restaurant class allows you to instantiate restaurant objects
+ * that store all of the restaurant data: name, location, menu and tags.
+ * 
+ *  Completely Programmed by Aaron Avram
+ *  Date Programmed: June 14, 2024
+ */
+
 package com.ufa.cs.project;
 
 import java.util.HashMap;
