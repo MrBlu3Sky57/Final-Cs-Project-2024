@@ -33,16 +33,21 @@ public class Helpers {
      * @return Returns true if the user can be added and false if the username already exists
      */
     public static boolean addUser(String username, String password, Map<String, User> users) {
+
+        // If user already exists, cannot add user
         if (checkUser(username)) {
             return false;
         }
 
         Connection con;
+
+        // Create new user
         User user = new User(username, password);
 
         try {
             con = DriverManager.getConnection(DB);
 
+            // Insert user into database
             String input = "INSERT INTO users (username, password) VALUES (?, ?)";
             try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)){
                 pstmt.setString(1, username);
@@ -50,6 +55,7 @@ public class Helpers {
                 pstmt.executeUpdate();
             }
 
+            // Get user id
             String id = null;
             input = "SELECT id FROM users WHERE username = ? and password = ?";
             try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)){
@@ -58,9 +64,11 @@ public class Helpers {
                 id = pstmt.executeQuery().getString(1);
             }
 
+            // Put user and their id into the map
             users.put(id, user);
         } catch(Exception e) {
             System.out.println(e);
+            return false;
         }
         return true;
     }
@@ -77,21 +85,30 @@ public class Helpers {
         try {
             con = DriverManager.getConnection(DB);
 
+            // Find how many users have the inputted username
             String input = "SELECT COUNT(*) FROM users WHERE username = ?";
             try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 pstmt.setString(1, username);
                 numUsers = pstmt.executeQuery().getInt(1);
             }
 
+            // If there are none, the user does not exist
             if (numUsers == 0) {
                 return false;
             }
         } catch (Exception e) {
             System.out.println(e);
+            return false;
         }
         return true;
     }
 
+    /**
+     * Verify that username and password match database values
+     * @param username Inputted username
+     * @param password Inputted password
+     * @return True if valid input and false otherwise
+     */
     public static boolean authenticateUser(String username, String password) {
         Connection con;
         int numUsers;
@@ -99,6 +116,7 @@ public class Helpers {
         try {
             con = DriverManager.getConnection(DB);
 
+            // Find how many users in the database have this username and password
             String input = "SELECT COUNT(*) FROM users WHERE username = ? and password = ?";
             try (PreparedStatement pstmt = con.prepareStatement(input)) {
                 pstmt.setString(1, username);
@@ -107,6 +125,7 @@ public class Helpers {
                 numUsers = pstmt.executeQuery().getInt(1);
             }
 
+            // If there are none, user is not verified
             if (numUsers == 0) {
                 return false;
             }
@@ -130,9 +149,12 @@ public class Helpers {
             con = DriverManager.getConnection(DB);
             stmt = con.createStatement();
 
+            // Get every user from the database
             ResultSet rs = stmt.executeQuery("SELECT * FROM users");
 
             User user = null;
+            
+            // Fill user map with database data
             while (rs.next()) {
                 String id = rs.getString(1);
                 user = new User(rs.getString(2), rs.getString(3));
@@ -156,6 +178,8 @@ public class Helpers {
      * @return True or false, if restaurant is not already in database
      */
     public static boolean addRestaurant(String name, String location, Map<String, Double> menu, Map<String, String> tags, Map<String, Restaurant> restaurants) {
+        
+        // If restaurant is already in database, restaurant cannot be added
         if (checkRestaurant(name)) {
             return false;
         }
@@ -164,8 +188,9 @@ public class Helpers {
 
         try {
             con = DriverManager.getConnection(DB);
+
+            // Insert new restaurant into database
             String input = "INSERT INTO restaurants (name, location) VALUES (?, ?)";
-            
             try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 pstmt.setString(1, name);
                 pstmt.setString(2, location);
@@ -173,16 +198,16 @@ public class Helpers {
                 pstmt.executeUpdate();
             }
 
+            // Get restaurant id
             input = "SELECT id FROM restaurants WHERE name = ?";
-
             try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 pstmt.setString(1, name);
 
                 id = pstmt.executeQuery().getString(1);
             }
 
+            // Insert restaurant menu into database
             input = "INSERT INTO menus (restaurant_id, item_name, price) VALUES (?, ?, ?)";
-
             try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 for (Map.Entry<String, Double> pair : menu.entrySet()) {
                     pstmt.setString(1, id);
@@ -194,8 +219,8 @@ public class Helpers {
 
             }
 
+            // Insert restaurant tags into database
             input = "INSERT INTO tags (restaurant_id, tag_type, tag_value) VALUES (?, ?, ?)";
-
             try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 for (Map.Entry<String, String> pair : tags.entrySet()) {
                     pstmt.setString(1, id);
@@ -210,7 +235,9 @@ public class Helpers {
             System.out.println(e);
         }
         
+        // Add restaurant to restaurants map
         restaurants.put(id, new Restaurant(name, location, menu, tags));
+
         return true;
 
     }
@@ -227,12 +254,14 @@ public class Helpers {
         try {
             con = DriverManager.getConnection(DB);
 
+            // Get how many restaurants have this name
             String input = "SELECT COUNT(*) FROM restaurants WHERE name like ?";
             try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 pstmt.setString(1, restrName);
                 numRestr = pstmt.executeQuery().getInt(1);
             }
 
+            // If there are none, return false
             if (numRestr == 0) {
                 return false;
             }
@@ -256,13 +285,17 @@ public class Helpers {
             con = DriverManager.getConnection(DB);
             stmt = con.createStatement();
 
+            // Get all of the restaurant data
             ResultSet rs = stmt.executeQuery("SELECT * FROM restaurants");
 
             Map<String, Double> menu = new HashMap<>();
             Map<String, String> tags = new HashMap<>();
+
+            // For each restaurant get the tag and menu data
             while (rs.next()) {
                 String id = rs.getString(1);
 
+                // Get the menu data for a restaurant
                 String input = "SELECT item_name, price FROM menus WHERE restaurant_id = ?";
                 ResultSet tempRs;
                 try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
@@ -275,6 +308,7 @@ public class Helpers {
                     }
                 }
 
+                // Get the tag data for a restaurant
                 input = "SELECT tag_type, tag_value FROM tags WHERE restaurant_id = ?";
                 try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
                     pstmt.setString(1, id);
@@ -285,7 +319,11 @@ public class Helpers {
                         tags.put(tempRs.getString(1), tempRs.getString(2));
                     }
                 }
+
+                // Add new restaurant to restr map
                 restr.put(id, new Restaurant(rs.getString(2), rs.getString(3), menu, tags));
+
+                // Clear temporary maps
                 menu.clear();
                 tags.clear();
             }
@@ -310,9 +348,12 @@ public class Helpers {
             con = DriverManager.getConnection(DB);
 
             String input = "";
-            if (rated(userId, restrId, ratingType)) {
-                input = "UPDATE ratings SET rating = ? WHERE user_id = ? and restaurant_id = ? and rating_type = ?";
 
+            // If user has already rated this restaurant
+            if (rated(userId, restrId, ratingType)) {
+
+                // Update user's rating
+                input = "UPDATE ratings SET rating = ? WHERE user_id = ? and restaurant_id = ? and rating_type = ?";
                 try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
                     pstmt.setDouble(1, rating);
                     pstmt.setString(2, userId);
@@ -321,9 +362,13 @@ public class Helpers {
 
                     pstmt.executeUpdate();
                 }
-            } else {
-                input = "INSERT INTO ratings (user_id, restaurant_id, rating_type, rating) VALUES (?, ?, ?, ?)";
+            } 
+            
+            // If this is a new rating
+            else {
 
+                // Insert new rating into database
+                input = "INSERT INTO ratings (user_id, restaurant_id, rating_type, rating) VALUES (?, ?, ?, ?)";
                 try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
                     pstmt.setString(1, userId);
                     pstmt.setString(2, restrId);
@@ -350,6 +395,8 @@ public class Helpers {
 
         try {
             con = DriverManager.getConnection(DB);
+
+            // Check how many times a user has rated a restaurant
             String input = "SELECT COUNT(*) FROM ratings WHERE user_id = ? and restaurant_id = ?";
 
             try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
@@ -358,6 +405,7 @@ public class Helpers {
 
                 numRates = pstmt.executeQuery().getInt(1);
 
+                // If there are none, return false
                 if (numRates == 0) {
                     return false;
                 }
@@ -381,8 +429,9 @@ public class Helpers {
 
         try {
             con = DriverManager.getConnection(DB);
-            String input = "SELECT COUNT(*) FROM ratings WHERE user_id = ? and restaurant_id = ? and rating_type = ?";
 
+            // Check how many times a user has a rated a restaurant for a particular category
+            String input = "SELECT COUNT(*) FROM ratings WHERE user_id = ? and restaurant_id = ? and rating_type = ?";
             try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 pstmt.setString(1, userId);
                 pstmt.setString(2, restrId);
@@ -390,6 +439,7 @@ public class Helpers {
 
                 numRates = pstmt.executeQuery().getInt(1);
 
+                // If there are none, return false
                 if (numRates == 0) {
                     return false;
                 }
@@ -412,6 +462,7 @@ public class Helpers {
         try {
             con = DriverManager.getConnection(DB);
 
+            // Get id of user with inputted username
             String input = "SELECT id FROM users WHERE username = ?";
             try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 pstmt.setString(1, username);
@@ -436,6 +487,7 @@ public class Helpers {
         try {
             con = DriverManager.getConnection(DB);
 
+            // Get id of restaurant with given name
             String input = "SELECT id FROM restaurants WHERE name like ?";
             try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 pstmt.setString(1, restrName);
@@ -460,6 +512,7 @@ public class Helpers {
         try {
             con = DriverManager.getConnection(DB);
 
+            // Get all of a users ratings for each tag value
             String input = "SELECT restaurant_id, rating_type, rating FROM ratings WHERE user_id = ?";
             ArrayList<String> types = new ArrayList<>();
             ArrayList<String> rates = new ArrayList<>();
@@ -467,11 +520,14 @@ public class Helpers {
             try (PreparedStatement pstmt = con.prepareStatement(input)) {
                 pstmt.setString(1, userId);
                 try (ResultSet rs = pstmt.executeQuery()) {
+
+                    // Iterate through each rating and convert rating type to tag type
                     while(rs.next()) {
                         String restrId = rs.getString("restaurant_id");
                         String tag = CONVERT.get(rs.getString("rating_type"));
                         String tagValue = null;
         
+                        // Get the corresponding tag value for the tag type of each rating
                         input = "SELECT tag_value FROM tags WHERE restaurant_id = ? and tag_type = ?";
                         try (PreparedStatement tagPstmt = con.prepareStatement(input)) {
                             tagPstmt.setString(1, restrId);
@@ -491,6 +547,8 @@ public class Helpers {
 
                 }
             }
+            
+            // Format ratings as a two dimensional array
             ratings = new String[2][types.size()];
             for (int i = 0; i < types.size(); i++) {
                 ratings[0][i] = types.get(i);
@@ -523,6 +581,7 @@ public class Helpers {
         try {
             con = DriverManager.getConnection(DB);
 
+            // Get all of the ratings for a specific restaurants
             String input = "SELECT rating_type, rating FROM ratings WHERE restaurant_id = ?";
             ArrayList<String> types = new ArrayList<>();
             ArrayList<String> rates = new ArrayList<>();
@@ -530,10 +589,13 @@ public class Helpers {
             try (PreparedStatement pstmt = con.prepareStatement(input)) {
                 pstmt.setString(1, restrId);
                 try (ResultSet rs = pstmt.executeQuery()) {
+
+                    // For each rating convert rating type to tag type
                     while(rs.next()) {
                         String tag = CONVERT.get(rs.getString("rating_type"));
                         String tagValue = null;
         
+                        // Get the corresponding tag value for each tag type
                         input = "SELECT tag_value FROM tags WHERE restaurant_id = ? and tag_type = ?";
                         try (PreparedStatement tagPstmt = con.prepareStatement(input)) {
                             tagPstmt.setString(1, restrId);
@@ -553,6 +615,7 @@ public class Helpers {
                 }
             }
 
+            // Format ratings as a two-dimensional array
             ratings = new String[2][types.size()];
             for (int i = 0; i < types.size(); i++) {
                 ratings[0][i] = types.get(i);

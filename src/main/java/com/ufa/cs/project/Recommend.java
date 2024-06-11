@@ -87,6 +87,7 @@ public class Recommend {
      * @param key The key by which to sort the array
      */
     public static void sort(String[] arr, Map<String, Double> key) {
+        // If edge cases stop
         if (arr == null || arr.length < 2) {
             return;
         } else {
@@ -102,8 +103,12 @@ public class Recommend {
      * @param key The key by which to sort the array
      */
     public static void mergeSort(String[] arr, int left, int right, Map<String, Double> key) {
+        // If indices are in proper order
         if (left < right) {
+            // Find middle
             int mid = (left + right) / 2;
+
+            // Sort left and right halves then merge them
             mergeSort(arr, left, mid, key);
             mergeSort(arr, mid + 1, right, key);
             merge(arr, left, mid, right, key);
@@ -123,6 +128,7 @@ public class Recommend {
         int n1 = m - l + 1;
         int n2 = r - m;
 
+        // Populate half arrays with data
         String[] half1 = new String[n1];
         String[] half2 = new String[n2];
 
@@ -137,6 +143,8 @@ public class Recommend {
         i = 0;
         j = 0;
         k = l;
+
+        // Merge two half arrays into a new sorted one
         while (i < n1 && j < n2) {
             if (key.get(half1[i]) >= key.get(half2[j])) {
                 arr[k] = half1[i]; 
@@ -147,6 +155,8 @@ public class Recommend {
             }
             k++;
         }
+
+        // Add any remaining data in both halves
 
         while (i < n1) {
             arr[k] = half1[i]; 
@@ -169,9 +179,12 @@ public class Recommend {
     public static String[] avgRecommend(Map<String, Restaurant> restaurants) {
         Map<String, Double> netAvgRatings = new HashMap<String, Double>();
 
+        // Get the ids of all of the restaurants
         Set<String> keySet = restaurants.keySet();
         String[] ids = new String[keySet.size()];
         ids = keySet.toArray(ids);
+
+        // For each id, get the avg ratings of the restaurant
         for (String id : ids) {
             String[][] restrRatings = Helpers.getRestrRatings(id);
             Map<String, Double> avgRatings = getAvgRatings(restrRatings);
@@ -185,6 +198,7 @@ public class Recommend {
             netAvgRatings.put(id, avg);
         }
 
+        // Sort the ids based on average rating
         sort(ids, netAvgRatings);
 
         int numReturn = 0;
@@ -194,6 +208,7 @@ public class Recommend {
             numReturn = 50;
         }
 
+        // Return the recommendations
         String[] recs = new String[numReturn];
         for (int i = 0; i < numReturn; i++) {
             recs[i] = ids[i];
@@ -211,9 +226,12 @@ public class Recommend {
     public static String[] avgRecommend(Map<String, Restaurant> restaurants, int numReturns) {
         Map<String, Double> netAvgRatings = new HashMap<String, Double>();
 
+        // Get the restaurant ids
         Set<String> keySet = restaurants.keySet();
         String[] ids = new String[keySet.size()];
         ids = keySet.toArray(ids);
+
+        // For each restaurant id get the average rating
         for (String id : ids) {
             String[][] restrRatings = Helpers.getRestrRatings(id);
             Map<String, Double> avgRatings = getAvgRatings(restrRatings);
@@ -227,6 +245,7 @@ public class Recommend {
             netAvgRatings.put(id, avg);
         }
 
+        // Sort ids based on average rating
         sort(ids, netAvgRatings);
 
         int numReturn = 0;
@@ -236,6 +255,7 @@ public class Recommend {
             numReturn = numReturns;
         }
 
+        // Return the right number of ids
         String[] recs = new String[numReturn];
         for (int i = 0; i < numReturn; i++) {
             recs[i] = ids[i];
@@ -255,15 +275,19 @@ public class Recommend {
         Map<String, Double> weights = getWeights(userRatings);
         Map<String, Double> netRatings = new HashMap<String, Double>();
 
+        // Get all of the restaurant ids
         Set<String> keySet = restaurants.keySet();
         String[] ids = new String[keySet.size()];
         ids = keySet.toArray(ids);
 
+        // Get the average rating and personal user rating for each id
         for (String id : ids) {
             String[][] restrRatings = Helpers.getRestrRatings(id);
             Map<String, Double> avgRating = getAvgRatings(restrRatings);
 
             Double net = 0.0;
+
+            // Find a weighted average, unique to the user, for each id
             for (String key : avgRating.keySet()) {
                 if (weights.containsKey(key)) {
                     net += avgRating.get(key) * weights.get(key);
@@ -275,6 +299,7 @@ public class Recommend {
             netRatings.put(id, net);
         }
 
+        // Sort the restaurant ids based on these ratings
         sort(ids, netRatings);
 
         ArrayList<String> temp = new ArrayList<>();
@@ -287,6 +312,7 @@ public class Recommend {
             }
         }
 
+        // Return the correct number of recommendations
         String[] recs = new String[temp.size()];
         for (int i = 0; i < temp.size(); i++) {
             recs[i] = temp.get(i);
