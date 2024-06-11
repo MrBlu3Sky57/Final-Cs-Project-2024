@@ -1,3 +1,50 @@
+body {
+    background-color: #383148; 
+    color: #c6cfdf; 
+
+}
+
+#title h1 {
+    font-size: 8em;
+    font-weight: 600;
+    text-shadow: 3.9px -0.8px 0px #9199a5, 7.1px -1.6px 0px #5d626a, 0 0 20px black;
+    margin-bottom: 0px;
+   
+}
+#title p {
+    font-size: 2em;
+    font-weight: 300;
+    line-height: 40px;
+}
+
+.btn {
+    color: white; 
+    background-color: #c52a3e;
+    border-color: #ca2a3f;
+}
+
+.navbar {
+    font-weight: 600;
+    text-shadow: 0.1px -0.1px 0px #9199a5, 0.2px -0.2px 0px #5d626a, 0 0 10px black;
+    background-color: #2b243b;
+    color: #c6cfdf;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000; /* Ensure it's above other content */
+    transition: top 0.5s; /* Smooth transition for hiding/showing */
+    border-bottom: white;
+}
+.hidden {
+display: none;
+}
+
+.btn:hover {
+    background-color: #d04154; 
+    border-color:#ca2a3f;
+}
+
 li {
     list-style-type: none;
 }
