@@ -7,16 +7,16 @@
 
 // Event Listener for the DOM Content
 document.addEventListener('DOMContentLoaded', function () {
-
+    
     // If there is no current user go to login page
-    if (localStorage.getItem("id") !== null) {
+     if (localStorage.getItem("id") !== null) {
         setupLoggedInView();  
     } 
     
     // If there is a current user go to logged in page
     else {
         setupLoginView();
-    }
+    }  
 
     /**
      * Gives user the login page so they can enter their username and password
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function setupLoginView() {
         document.getElementById('main').innerHTML = `
             <div class="mb-3">
-                <h5>Login to Restaurant Tracker</h5>
+                <h5>Login to TAFTR</h5>
                 <form id="loginForm">
                     <div class="mb-3">
                         <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="username" name="username" placeholder="Username" type="text" required>
@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // If user clicks on signUp, display sign up page
             document.getElementById('main').innerHTML = `
             <div class="mb-3">
-                <h5>Make a Restaurant Tracker Account</h5>
+                <h5>Create Your Taftr Account</h5>
                 <form id="signUpForm">
                     <div class="mb-3">
                         <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="username" name="username" placeholder="Username" type="text" required>
@@ -427,4 +427,20 @@ document.addEventListener('DOMContentLoaded', function () {
             window.location.replace('/');
         });
     }
+    function showNavbar() {
+        document.getElementById("navbar").classList.remove("hidden");
+    }
+    function hideNavbar() {
+        document.getElementById("navbar").classList.add("hidden");
+    }
+    let prevScrollpos = window.scrollY;
+window.onscroll = function() {
+    let currentScrollPos = window.scrollY;
+    if (prevScrollpos > currentScrollPos) {
+        document.getElementById("navbar").style.top = "0";
+    } else {
+        document.getElementById("navbar").style.top = "-50px"; /* Adjust this value based on the navbar height */
+    }
+    prevScrollpos = currentScrollPos;
+}
 });
