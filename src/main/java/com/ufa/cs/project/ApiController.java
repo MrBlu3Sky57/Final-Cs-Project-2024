@@ -69,8 +69,6 @@ public class ApiController {
     @PostMapping("/signUp")
     public ResponseEntity<Object> signUp(@RequestParam(name="username") String username, @RequestParam(name="password") String password) {
         boolean status = Helpers.addUser(username, password, users);
-        System.out.println(username + password);
-        System.out.println(status);
         Map<String, Object> responseBody = new HashMap<String, Object>();
     
         if (status) {
