@@ -68,8 +68,13 @@ public class ApiController {
      */
     @PostMapping("/signUp")
     public ResponseEntity<Object> signUp(@RequestParam(name="username") String username, @RequestParam(name="password") String password) {
-        boolean status = Helpers.addUser(username, password, users);
         Map<String, Object> responseBody = new HashMap<String, Object>();
+        
+        if (username == "" || password == "") {
+            responseBody.put("verification", false);
+            return new ResponseEntity<Object>(responseBody, HttpStatus.NOT_FOUND);
+        }
+        boolean status = Helpers.addUser(username, password, users);
     
         if (status) {
             responseBody.put("verification", true);

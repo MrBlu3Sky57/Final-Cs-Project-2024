@@ -28,10 +28,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 <h5>Login to Restaurant Tracker</h5>
                 <form id="loginForm">
                     <div class="mb-3">
-                        <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="username" name="username" placeholder="Username" type="text">
+                        <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="username" name="username" placeholder="Username" type="text" required>
                     </div>
                     <div class="mb-3">
-                        <input class="form-control mx-auto w-auto" id="password" name="password" placeholder="Password" type="password">
+                        <input class="form-control mx-auto w-auto" id="password" name="password" placeholder="Password" type="password" required>
                     </div>
                     <button class="btn btn-primary" type="submit">Log In</button>
                 </form>
@@ -83,10 +83,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 <h5>Make a Restaurant Tracker Account</h5>
                 <form id="signUpForm">
                     <div class="mb-3">
-                        <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="username" name="username" placeholder="Username" type="text">
+                        <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="username" name="username" placeholder="Username" type="text" required>
                     </div>
                     <div class="mb-3">
-                        <input class="form-control mx-auto w-auto" id="password" name="password" placeholder="Password" type="password">
+                        <input class="form-control mx-auto w-auto" id="password" name="password" placeholder="Password" type="password" required>
                     </div>
                     <button class="btn btn-primary" type="submit">Create Account</button>
                 </form>
