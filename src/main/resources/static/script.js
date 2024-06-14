@@ -206,6 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('recommendButton').addEventListener('click', toggleRecommend);
         document.getElementById('addRestrButton').addEventListener('click', displayAddRestrForm);
 
+        // Displaying form for adding restaurant    Author: Ishai Tepper
         function displayAddRestrForm() {
             document.getElementById('main').innerHTML = `
                 <div class="mb-3">
@@ -235,6 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             document.getElementById('addRestr').addEventListener('submit', handleAddRestr);
 
+            // Handles the adding of a restaurant from form    Author: Ishai Tepper
             function handleAddRestr(event) {
                 event.preventDefault();
                 const formData = new FormData(event.target);
@@ -397,6 +399,7 @@ document.addEventListener('DOMContentLoaded', () => {
     /**
      * Checks if a restaurant was successfully added
      * @param {*} data The container for the verification and id values
+     * @author Ishai Tepper
      */
     function checkAddRestr(data) {
         if (data.verification) {
