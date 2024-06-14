@@ -193,11 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
 
-        /**
-         * Section of code responsible for style changes once logged in
-         * 
-         * Author: Ishai Tepper
-         */
+        // Changes style once logged in.     Author: Ishai Tepper
         subtitle.classList.add('hidden');
         title.classList.add('shrink');
         navbar.classList.remove('hidden');
@@ -208,7 +204,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('searchButton').addEventListener('click', toggleSearch);
         document.getElementById('rateButton').addEventListener('click', toggleRate);
         document.getElementById('recommendButton').addEventListener('click', toggleRecommend);
-
         document.getElementById('addRestrButton').addEventListener('click', displayAddRestrForm);
 
         function displayAddRestrForm() {
@@ -223,10 +218,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             <input class="form-control mx-auto w-auto" id="location" name="location" placeholder="Location" type="text" required>
                         </div>
                         <div class="mb-3">
-                            <textarea class="form-control mx-auto w-auto" id="menu" name="menu" placeholder="Menu (JSON format)" rows="5" required></textarea>
+                            <textarea class="form-control mx-auto w-auto" id="menu" name="menu" placeholder="Menu (item1,price1,...)" rows="5" required></textarea>
                         </div>
                         <div class="mb-3">
-                            <textarea class="form-control mx-auto w-auto" id="tags" name="tags" placeholder="Tags (JSON format)" rows="3" required></textarea>
+                            <textarea class="form-control mx-auto w-auto" id="tags" name="tags" placeholder="Tags (tag1,desc1,...)" rows="3" required></textarea>
                         </div>
                         <button class="btn btn-primary" type="submit">Add Restaurant</button>
                     </form>
@@ -399,6 +394,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    /**
+     * Checks if a restaurant was successfully added
+     * @param {*} data The container for the verification and id values
+     */
     function checkAddRestr(data) {
         if (data.verification) {
             localStorage.setItem('id', data.id);

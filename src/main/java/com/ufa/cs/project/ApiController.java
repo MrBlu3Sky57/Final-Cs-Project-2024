@@ -18,9 +18,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/*
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
-
+*/
 
 
 
@@ -92,6 +93,8 @@ public class ApiController {
 
     /**
      * Processes an added restaurant
+     * @author Ishai Tepper
+     * 
      * @param name The restaurant name
      * @param location The restaurant location
      * @param menu The restaurant's menu
@@ -103,9 +106,8 @@ public ResponseEntity<Object> addRestr(@RequestParam(name="name") String name, @
     Map<String, Object> responseBody = new HashMap<>();
 
     try {
-        ObjectMapper objectMapper = new ObjectMapper();
-        Map<String, Double> menuMap = objectMapper.readValue(menu, new TypeReference<Map<String, Double>>() {});
-        Map<String, String> tagsMap = objectMapper.readValue(tags, new TypeReference<Map<String, String>>() {});
+        Map<String, Double> menuMap = parseMenu(menu);
+        Map<String, String> tagsMap = parseTags(tags);
 
         boolean status = Helpers.addRestaurant(name, location, menuMap, tagsMap, restaurants);
 
@@ -126,7 +128,37 @@ public ResponseEntity<Object> addRestr(@RequestParam(name="name") String name, @
     }
 }
 
-   
+private Map<String, Double> parseMenu(String menu) throws Exception {
+    String[] menuItems = menu.split(",");
+    if (menuItems.length % 2 != 0) {
+        throw new Exception("Invalid menu format. Ensure each item is followed by its price.");
+    }
+
+    Map<String, Double> menuMap = new HashMap<>();
+    for (int i = 0; i < menuItems.length; i += 2) {
+        String item = menuItems[i].trim();
+        Double price = Double.parseDouble(menuItems[i + 1].trim());
+        menuMap.put(item, price);
+    }
+    return menuMap;
+}
+
+private Map<String, String> parseTags(String tags) throws Exception {
+    String[] tagItems = tags.split(",");
+    if (tagItems.length % 2 != 0) {
+        throw new Exception("Invalid tags format. Ensure each key is followed by its value.");
+    }
+
+    Map<String, String> tagsMap = new HashMap<>();
+    for (int i = 0; i < tagItems.length; i += 2) {
+        String key = tagItems[i].trim();
+        String value = tagItems[i + 1].trim();
+        tagsMap.put(key, value);
+    }
+    return tagsMap;
+}
+
+
     /**
      * Processes a new rating
      * @param ratingType The rating type
