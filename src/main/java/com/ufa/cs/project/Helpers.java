@@ -176,71 +176,62 @@ public class Helpers {
      * @param tags The restaurant's tags
      * @param restaurants The restaurants map
      * @return True or false, if restaurant is not already in database
-     */
+     */        
     public static boolean addRestaurant(String name, String location, Map<String, Double> menu, Map<String, String> tags, Map<String, Restaurant> restaurants) {
+            if (checkRestaurant(name)) {
+                return false;
+            }
+            Connection con;
+            String id = null;
         
-        // If restaurant is already in database, restaurant cannot be added
-        if (checkRestaurant(name)) {
-            return false;
-        }
-        Connection con;
-        String id = null;
-
-        try {
-            con = DriverManager.getConnection(DB);
-
-            // Insert new restaurant into database
-            String input = "INSERT INTO restaurants (name, location) VALUES (?, ?)";
-            try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                pstmt.setString(1, name);
-                pstmt.setString(2, location);
-
-                pstmt.executeUpdate();
-            }
-
-            // Get restaurant id
-            input = "SELECT id FROM restaurants WHERE name = ?";
-            try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                pstmt.setString(1, name);
-
-                id = pstmt.executeQuery().getString(1);
-            }
-
-            // Insert restaurant menu into database
-            input = "INSERT INTO menus (restaurant_id, item_name, price) VALUES (?, ?, ?)";
-            try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                for (Map.Entry<String, Double> pair : menu.entrySet()) {
-                    pstmt.setString(1, id);
-                    pstmt.setString(2, pair.getKey());
-                    pstmt.setDouble(3, pair.getValue());
-
+            try {
+                con = DriverManager.getConnection(DB);
+        
+                // Insert new restaurant into database
+                String input = "INSERT INTO restaurants (name, location) VALUES (?, ?)";
+                try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                    pstmt.setString(1, name);
+                    pstmt.setString(2, location);
                     pstmt.executeUpdate();
+        
+                    ResultSet rs = pstmt.getGeneratedKeys();
+                    if (rs.next()) {
+                        id = rs.getString(1);
+                    }
                 }
-
-            }
-
-            // Insert restaurant tags into database
-            input = "INSERT INTO tags (restaurant_id, tag_type, tag_value) VALUES (?, ?, ?)";
-            try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                for (Map.Entry<String, String> pair : tags.entrySet()) {
-                    pstmt.setString(1, id);
-                    pstmt.setString(2, pair.getKey());
-                    pstmt.setString(3, pair.getValue());
-
-                    pstmt.executeUpdate();
+        
+                // Insert restaurant menu into database
+                input = "INSERT INTO menus (restaurant_id, item_name, price) VALUES (?, ?, ?)";
+                try (PreparedStatement pstmt = con.prepareStatement(input)) {
+                    for (Map.Entry<String, Double> pair : menu.entrySet()) {
+                        pstmt.setString(1, id);
+                        pstmt.setString(2, pair.getKey());
+                        pstmt.setDouble(3, pair.getValue());
+                        pstmt.executeUpdate();
+                    }
                 }
-
+        
+                // Insert restaurant tags into database
+                input = "INSERT INTO tags (restaurant_id, tag_type, tag_value) VALUES (?, ?, ?)";
+                try (PreparedStatement pstmt = con.prepareStatement(input)) {
+                    for (Map.Entry<String, String> pair : tags.entrySet()) {
+                        pstmt.setString(1, id);
+                        pstmt.setString(2, pair.getKey());
+                        pstmt.setString(3, pair.getValue());
+                        pstmt.executeUpdate();
+                    }
+                }
+        
+            } catch (Exception e) {
+                System.out.println("Error in addRestaurant: " + e.getMessage());
+                e.printStackTrace();
+                return false;
             }
-        } catch(Exception e) {
-            System.out.println(e);
+        
+            restaurants.put(id, new Restaurant(name, location, menu, tags));
+            return true;
         }
         
-        // Add restaurant to restaurants map
-        restaurants.put(id, new Restaurant(name, location, menu, tags));
-
-        return true;
-
-    }
 
     /**
      * Check if a restaurant is already in the database
@@ -481,24 +472,22 @@ public class Helpers {
      * @return The id for the username
      */
     public static String getRestrId(String restrName) {
-        Connection con;
         String id = null;
-        
-        try {
-            con = DriverManager.getConnection(DB);
-
-            // Get id of restaurant with given name
-            String input = "SELECT id FROM restaurants WHERE name like ?";
-            try (PreparedStatement pstmt = con.prepareStatement(input, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                pstmt.setString(1, restrName);
-                id = pstmt.executeQuery().getString(1);
+        String query = "SELECT id FROM restaurants WHERE name = ?";
+        try (Connection con = DriverManager.getConnection(DB);
+             PreparedStatement pstmt = con.prepareStatement(query)) {
+            pstmt.setString(1, restrName);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                id = rs.getString("id");
             }
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println("Error in getRestrId: " + e.getMessage());
+            e.printStackTrace();
         }
-
         return id;
     }
+    
 
     /**
      * Gets the user's ratings from the database

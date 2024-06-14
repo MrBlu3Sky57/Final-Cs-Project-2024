@@ -18,6 +18,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+
+
 
 
 // Rest controller that implenents REStful APIs
@@ -85,7 +89,44 @@ public class ApiController {
             return new ResponseEntity<Object>(responseBody, HttpStatus.NOT_FOUND);
         }
     }
-    
+
+    /**
+     * Processes an added restaurant
+     * @param name The restaurant name
+     * @param location The restaurant location
+     * @param menu The restaurant's menu
+     * @param tags The restaurant's tags
+     * @return A verification if the restaurant was valid
+     */ 
+    @PostMapping("/addRestr")
+public ResponseEntity<Object> addRestr(@RequestParam(name="name") String name, @RequestParam(name="location") String location, @RequestParam(name="menu") String menu, @RequestParam(name="tags") String tags) {
+    Map<String, Object> responseBody = new HashMap<>();
+
+    try {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Double> menuMap = objectMapper.readValue(menu, new TypeReference<Map<String, Double>>() {});
+        Map<String, String> tagsMap = objectMapper.readValue(tags, new TypeReference<Map<String, String>>() {});
+
+        boolean status = Helpers.addRestaurant(name, location, menuMap, tagsMap, restaurants);
+
+        if (status) {
+            responseBody.put("verification", true);
+            responseBody.put("id", Helpers.getRestrId(name));
+            return new ResponseEntity<>(responseBody, HttpStatus.OK);
+        } else {
+            responseBody.put("verification", false);
+            return new ResponseEntity<>(responseBody, HttpStatus.NOT_FOUND);
+        }
+    } catch (Exception e) {
+        System.out.println("Error in addRestr: " + e.getMessage());
+        e.printStackTrace();
+        responseBody.put("verification", false);
+        responseBody.put("error", e.getMessage());
+        return new ResponseEntity<>(responseBody, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}
+
+   
     /**
      * Processes a new rating
      * @param ratingType The rating type

@@ -1,3 +1,11 @@
+<!--  
+    HTML file for restaurant tracker website
+
+    Note: Unless otherwise specified in comments, code is written by Aaron
+    Authors: Aaron Avram, Ishai Tepper
+    Date Programmed: June 14, 2024
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -14,18 +22,32 @@
     <script src="script.js" defer></script>
 </head>
 <body>
-    <div id="navbar" class="navbar">
+    <div id="title" class="container-fluid py-5 text-center">
+        <h1>TAFTR</h1>
+    </div>
+    <div id="subtitle" class="container-fluid py-4 text-center">
+        <p>Track your favourite restaurants.<br>Rate your experiences.<br>Find something new.</p>
+    </div>
+    <div id="main" class="container-fluid py-1 text-center">     
+    </div>
+
+    <!-- Code for Navbar Element    Author: Ishai Tepper -->
+    <div id="navbar" class="navbar hidden">
         <div class="container-fluid">
             <span class="navbar-brand">TAFTR</span>
         </div>
     </div>
-    <div id="title" class="container-fluid py-5 text-center">
-        <h1>TAFTR</h1>
-        <p>Track your favourite restaurants.<br>Rate your experiences.<br>Find something new.</p>
-    </div>
-    <div id="main" class="container-fluid py-5 text-center">
 
+<!-- Code for Website Logo Art, needs to be centered    Author: Ishai Tepper -->
+<!-- 
+    <div id="logo">
+        <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="14" cy="19" r="7" fill="#c52a3e" opacity="0.93" /> Red Circle
+             <circle cx="19" cy="11" r="7" fill="#c6cfdf" opacity="0.93" /> White Circle
+            <circle cx="24" cy="19" r="7" fill="#8688c1" opacity="0.93" /> Purple Circle
+        </svg>
     </div>
-    
+-->
+
 </body>
 </html>
